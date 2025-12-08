@@ -82,7 +82,23 @@ app.use(cors({
     origin: function (origin, callback) {
         // Autoriser les requêtes sans origine (comme les apps mobiles ou curl)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
+
+        // En production (Railway), autoriser toutes les origines Railway
+        if (process.env.NODE_ENV === 'production' && origin && origin.includes('railway.app')) {
+            return callback(null, true);
+        }
+
+        // Vérifier si l'origine est dans la liste des origines autorisées
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+            if (allowedOrigin.includes('*')) {
+                // Support pour les wildcards (ex: https://*.railway.app)
+                const pattern = allowedOrigin.replace(/\*/g, '.*');
+                return new RegExp(`^${pattern}$`).test(origin);
+            }
+            return allowedOrigin === origin;
+        });
+
+        if (!isAllowed) {
             const msg = 'La politique CORS ne permet pas l\'accès depuis cette origine.';
             return callback(new Error(msg), false);
         }

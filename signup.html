@@ -372,6 +372,11 @@ if (form) {
             return;
         }
 
+        // Configuration de l'API - Détection automatique de l'environnement
+        const API_BASE_URL = window.location.hostname.includes('railway.app')
+          ? `${window.location.protocol}//${window.location.hostname}`
+          : '';
+
         const formData = new FormData(this);
         const data = {
             username: formData.get('username'),
@@ -383,12 +388,13 @@ if (form) {
         console.log('Données:', data);
 
         try {
-            const response = await fetch('/api/signup.php', {
+            const response = await fetch(`${API_BASE_URL}/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'include'
             });
 
             const result = await response.json();
@@ -396,14 +402,24 @@ if (form) {
 
             if (response.ok) {
                 localStorage.setItem('token', result.token);
-                localStorage.setItem('username', result.user.username);
-                localStorage.setItem('user_id', result.user.id);
+                localStorage.setItem('username', result.username);
+                localStorage.setItem('user_id', result.user_id);
                 window.location.href = result.redirect || '/dashboard';
             } else {
+                let errorMessage = 'Inscription échouée';
+
+                if (result.error === 'user_exists') {
+                    errorMessage = 'Un compte existe déjà avec cet email ou ce nom d\'utilisateur';
+                } else if (result.error === 'charter_not_accepted') {
+                    errorMessage = result.message || 'Vous devez accepter la charte';
+                } else if (result.message) {
+                    errorMessage = result.message;
+                }
+
                 if (typeof window.showToast === 'function') {
-                    window.showToast('Erreur: ' + (result.error || 'Inscription échouée'), 'error');
+                    window.showToast('Erreur: ' + errorMessage, 'error');
                 } else {
-                    alert('Erreur: ' + (result.error || 'Inscription échouée'));
+                    alert('Erreur: ' + errorMessage);
                 }
             }
         } catch (error) {
@@ -411,7 +427,7 @@ if (form) {
             if (typeof window.showToast === 'function') {
                 window.showToast('Erreur de connexion au serveur', 'error');
             } else {
-                alert('Erreur de connexion au serveur');
+                alert('Erreur de connexion au serveur: ' + error.message);
             }
         }
     });

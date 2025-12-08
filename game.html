@@ -1241,11 +1241,15 @@
         let activeUsername = null;
         let activeUserId = null;
 
+        // Configuration de l'API - Détection automatique de l'environnement
+        const API_BASE_URL = window.location.hostname.includes('railway.app')
+          ? `${window.location.protocol}//${window.location.hostname}`
+          : '';
 
         // Variables sociales/chat
-        const activeChats = {}; 
+        const activeChats = {};
         const friendsSidebar = document.getElementById('friendsSidebar');
-        const chatContainer = document.getElementById('chat-container'); 
+        const chatContainer = document.getElementById('chat-container');
         const userPill = document.getElementById('connectedUsername');
         if (userPill) {
             const storedUsername = localStorage.getItem('username');
@@ -1253,7 +1257,7 @@
                 userPill.textContent = storedUsername;
             }
         }
-        
+
         // Variables DOM
         const rankRangeInput = document.getElementById('rankRange');
         const rangeValueSpan = document.getElementById('rangeValue');
@@ -1286,7 +1290,10 @@
                 ...(options.headers || {})
             };
 
-            const response = await fetch(url, {
+            // Construire l'URL complète avec l'API Railway
+            const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+
+            const response = await fetch(fullUrl, {
                 ...options,
                 headers: headers,
             });

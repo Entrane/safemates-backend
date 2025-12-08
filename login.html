@@ -142,9 +142,14 @@
   <script src="animations.js"></script>
   <script>
 // Gestion du formulaire de connexion
+// Configuration de l'API - Détection automatique de l'environnement
+const API_BASE_URL = window.location.hostname.includes('railway.app')
+  ? `${window.location.protocol}//${window.location.hostname}`
+  : '';
+
 document.querySelector('.login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
-  
+
   const formData = new FormData(this);
   const data = {
     email: formData.get('email'),
@@ -152,37 +157,57 @@ document.querySelector('.login-form').addEventListener('submit', async function(
   };
 
   try {
-    const response = await fetch('/api/login.php', {
+    const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     });
 
     const result = await response.json();
-    
+
     if (response.ok) {
       // Stocker le token et rediriger
       localStorage.setItem('token', result.token);
-      localStorage.setItem('username', result.user.username);
-      localStorage.setItem('user_id', result.user.id);
-      if (result.user.isAdmin) {
+      localStorage.setItem('username', result.username);
+      localStorage.setItem('user_id', result.user_id);
+
+      // Vérifier si l'utilisateur est admin (si cette info est disponible)
+      if (result.isAdmin) {
         localStorage.setItem('isAdmin', 'true');
       }
+
       window.location.href = '/dashboard';
     } else {
+      // Gérer les différents types d'erreurs
+      let errorMessage = 'Identifiants incorrects';
+
+      if (result.error === 'invalid_credentials') {
+        errorMessage = 'Email ou mot de passe incorrect';
+      } else if (result.error === 'account_locked') {
+        errorMessage = result.message || 'Compte temporairement verrouillé';
+      } else if (result.error === 'banned') {
+        errorMessage = result.message || 'Compte banni';
+      } else if (result.error === 'suspended') {
+        errorMessage = result.message || 'Compte suspendu';
+      } else if (result.message) {
+        errorMessage = result.message;
+      }
+
       if (typeof window.showToast === 'function') {
-        window.showToast('Erreur: ' + (result.error || 'Identifiants incorrects'), 'error');
+        window.showToast('Erreur: ' + errorMessage, 'error');
       } else {
-        alert('Erreur: ' + (result.error || 'Identifiants incorrects'));
+        alert('Erreur: ' + errorMessage);
       }
     }
   } catch (error) {
+    console.error('Erreur de connexion:', error);
     if (typeof window.showToast === 'function') {
       window.showToast('Erreur de connexion au serveur', 'error');
     } else {
-      alert('Erreur de connexion au serveur');
+      alert('Erreur de connexion au serveur: ' + error.message);
     }
   }
 });
