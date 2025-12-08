@@ -1,0 +1,56 @@
+{
+  "name": "matchmates",
+  "version": "1.0.0",
+  "description": "Plateforme de matchmaking gaming 100% féminine - Backend & PWA",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js",
+    "prod": "NODE_ENV=production node server.js",
+    "test": "echo \"Tests à implémenter\" && exit 0",
+    "db:backup": "node database-manager.js backup",
+    "db:restore": "node database-manager.js restore",
+    "db:clean": "node database-manager.js clean",
+    "db:optimize": "node database-manager.js optimize",
+    "db:stats": "node database-manager.js stats",
+    "db:list": "node database-manager.js list",
+    "security:check": "node check-security.js",
+    "lint": "echo \"Linting à implémenter\" && exit 0",
+    "format": "echo \"Formatting à implémenter\" && exit 0"
+  },
+  "keywords": [
+    "gaming",
+    "matchmaking",
+    "pwa",
+    "women",
+    "gamer",
+    "social",
+    "chat"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.2.1",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.7",
+    "winston": "^3.18.3",
+    "xss-clean": "^0.1.4"
+  }
+}

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Clics - MatchMates</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    .test-box {
+      background: #1e293b;
+      padding: 30px;
+      margin: 20px 0;
+      border-radius: 12px;
+    }
+    .rank-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .rank-option {
+      text-align: center;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s, transform 0.2s;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 5px;
+      background: #0f172a;
+      position: relative;
+      z-index: 1;
+    }
+    .rank-option:hover {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+    .rank-option.active {
+      opacity: 1;
+      transform: scale(1.05);
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }
+    .rank-option img {
+      width: 60px;
+      height: 60px;
+      display: block;
+      margin: 0 auto 5px;
+      pointer-events: none;
+    }
+    .rank-option span {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      display: block;
+      pointer-events: none;
+    }
+    .rank-option.active span {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+    }
+    .radio-option input {
+      display: none;
+    }
+    .radio-option label {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 2px solid #334155;
+      background: #0f172a;
+      color: #94a3b8;
+      cursor: pointer;
+      flex-grow: 1;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .radio-option label:hover {
+      border-color: #4a5568;
+      background: rgba(34, 197, 94, 0.1);
+    }
+    .radio-option input:checked + label {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.2);
+      color: #f8fafc;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: #22c55e;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #16a34a;
+    }
+    #status {
+      background: #000;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .success { color: #22c55e; }
+    .error { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test des Clics - MatchMates</h1>
+
+  <div class="test-box">
+    <h2>Test 1: Sélection de Rang</h2>
+    <p>Cliquez sur un rang ci-dessous:</p>
+
+    <div class="rank-grid" id="rankGrid">
+      <div class="rank-option" data-rank="fer1" onclick="selectRank('fer1', event)">
+        <img src="/Valorant_rank/Iron_1_Rank.webp" alt="Fer 1">
+        <span>Fer 1</span>
+      </div>
+      <div class="rank-option" data-rank="bronze1" onclick="selectRank('bronze1', event)">
+        <img src="/Valorant_rank/Bronze_1_Rank.webp" alt="Bronze 1">
+        <span>Bronze 1</span>
+      </div>
+      <div class="rank-option" data-rank="argent1" onclick="selectRank('argent1', event)">
+        <img src="/Valorant_rank/Silver_1_Rank.webp" alt="Argent 1">
+        <span>Argent 1</span>
+      </div>
+      <div class="rank-option" data-rank="or1" onclick="selectRank('or1', event)">
+        <img src="/Valorant_rank/Gold_1_Rank.webp" alt="Or 1">
+        <span>Or 1</span>
+      </div>
+    </div>
+
+    <p>Rang sélectionné: <span id="selectedRank" style="color: #22c55e; font-weight: bold;">Aucun</span></p>
+  </div>
+
+  <div class="test-box">
+    <h2>Test 2: Sélection de Mode</h2>
+    <p>Cliquez sur un mode de jeu:</p>
+
+    <div class="radio-group">
+      <div class="radio-option">
+        <input type="radio" id="mode1" name="gameMode" value="Classé" onchange="selectMode('Classé')">
+        <label for="mode1">Classé</label>
+      </div>
+      <div class="radio-option">
+        <input type="radio" id="mode2" name="gameMode" value="Non Classé" onchange="selectMode('Non Classé')">
+        <label for="mode2">Non Classé</label>
+      </div>
+    </div>
+
+    <p>Mode sélectionné: <span id="selectedMode" style="color: #22c55e; font-weight: bold;">Aucun</span></p>
+  </div>
+
+  <div class="test-box">
+    <h2>Test 3: Bouton</h2>
+    <button onclick="testButton()">Cliquer ici pour tester</button>
+    <p id="buttonResult"></p>
+  </div>
+
+  <div id="status">
+    <strong>📊 Status des tests:</strong>
+    <div id="log"></div>
+  </div>
+
+  <script>
+    let selectedRank = null;
+    let selectedMode = null;
+
+    function log(message, type = 'success') {
+      const logDiv = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = type;
+      entry.textContent = `[${time}] ${message}`;
+      logDiv.appendChild(entry);
+      console.log(message);
+    }
+
+    function selectRank(rankId, event) {
+      log(`✅ Clic détecté sur le rang: ${rankId}`, 'success');
+      console.log('Event:', event);
+      console.log('Target:', event.target);
+
+      selectedRank = rankId;
+
+      // Mise à jour visuelle
+      document.querySelectorAll('.rank-option').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.querySelector(`[data-rank="${rankId}"]`).classList.add('active');
+
+      document.getElementById('selectedRank').textContent = rankId;
+    }
+
+    function selectMode(mode) {
+      log(`✅ Mode sélectionné: ${mode}`, 'success');
+      selectedMode = mode;
+      document.getElementById('selectedMode').textContent = mode;
+    }
+
+    function testButton() {
+      log('✅ Bouton cliqué avec succès!', 'success');
+      document.getElementById('buttonResult').innerHTML = '<span class="success">✅ Le bouton fonctionne!</span>';
+
+      if (selectedRank && selectedMode) {
+        log(`✅ Configuration complète: Rang=${selectedRank}, Mode=${selectedMode}`, 'success');
+      } else {
+        log('⚠️ Veuillez sélectionner un rang ET un mode', 'error');
+      }
+    }
+
+    // Test au chargement
+    window.onload = function() {
+      log('Page de test chargée', 'success');
+      log('Essayez de cliquer sur les éléments ci-dessus', 'success');
+
+      // Test de détection des clics
+      document.getElementById('rankGrid').addEventListener('click', function(e) {
+        log(`Clic détecté sur: ${e.target.tagName} (${e.target.className})`, 'success');
+      });
+    };
+  </script>
+</body>
+</html>

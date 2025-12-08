@@ -1,0 +1,58 @@
+# robots.txt pour MatchMates
+# Plateforme de matchmaking gaming 100% féminine
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /signup.html
+Allow: /login.html
+Allow: /contact.html
+Allow: /style.css
+Allow: /style-enhanced.css
+Allow: /components.css
+Allow: /animations.js
+Allow: /Image/
+
+# Pages privées et authentifiées - Ne pas indexer
+Disallow: /dashboard.html
+Disallow: /dashboard
+Disallow: /game.html
+Disallow: /game
+Disallow: /profile.html
+Disallow: /profile
+Disallow: /api/
+Disallow: /node_modules/
+Disallow: /*.sqlite
+Disallow: /logs/
+
+# Sitemap
+Sitemap: https://www.matchmates.fr/sitemap.xml
+
+# Délai d'attente entre les requêtes (10 secondes)
+Crawl-delay: 10
+
+# Agents spécifiques
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 10
+
+# Bloquer les bots malveillants
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /

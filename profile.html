@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7J6VTB5BZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-F7J6VTB5BZ');
+</script>
+  <meta charset="UTF-8" />
+  <title>Mon profil – SafeMates</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Police Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Ton CSS global -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-enhanced.css" />
+  <link rel="stylesheet" href="components.css" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5W9WJ9ZKEK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5W9WJ9ZKEK');
+  </script>
+</head>
+
+<body>
+  <div class="page-wrapper">
+    <!-- HEADER -->
+    <header>
+      <div class="logo">
+        <img src="Image/Image_jeux/a230f9f5-6918-4f03-9c70-1a27399bfa08.png" alt="SafeMates" class="logo-img">
+        <div class="logo-text">SafeMates</div>
+      </div>
+
+      <nav>
+  <a href="dashboard.html">Tableau de bord</a>
+  <a href="#">Paramètres</a>
+
+  <span style="margin-left:auto; margin-right: 12px; color: var(--text-muted);">
+    <!-- Tu peux remplacer ce texte par le pseudo en dur pour l'instant -->
+    Entrane
+  </span>
+
+  <a href="/logout" class="btn btn-outline">Déconnexion</a>
+</nav>
+    </header>
+
+    <!-- CONTENU PROFIL -->
+    <main>
+      <section style="margin-top: 40px;" data-animate>
+        <h1 class="section-title">Mon profil</h1>
+        <p class="section-subtitle">
+          Voici un aperçu de ton compte SafeMates. Bientôt tu pourras gérer ici tes jeux,
+          ton niveau, tes rôles préférés, et plus encore.
+        </p>
+
+        <!-- Carte principale de profil -->
+        <div class="hero-card" style="max-width: 520px; margin-top: 10px;">
+          <div class="hero-card-header">
+            <div>
+              <div class="hero-card-title">Infos du compte</div>
+              <div style="font-size: 11px; color: var(--text-muted);">
+                Connecté en tant que <span id="profile-username"></span>
+              </div>
+            </div>
+            <span class="hero-card-tag">Profil</span>
+          </div>
+
+          <div class="hero-list">
+            <div class="hero-player">
+              <div class="hero-player-left">
+                <div class="hero-avatar" id="profile-avatar">U</div>
+                <div class="hero-player-info">
+                  <div class="hero-player-name" id="profile-username-main">Username</div>
+                  <div class="hero-player-meta" id="profile-email">email@example.com</div>
+                </div>
+              </div>
+              <div class="hero-player-role">
+                Membre depuis
+                <span id="profile-created">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card-footer">
+            <span>
+              <span class="badge-online"></span>
+              Session active
+            </span>
+            <span id="profile-id">ID #</span>
+          </div>
+        </div>
+
+        <!-- Section placeholders -->
+        <section id="mes-jeux" style="margin-top: 40px;">
+          <h2 class="section-title">Mes jeux & rôles</h2>
+          <p class="section-subtitle">
+            Cette section pourra afficher les jeux auxquels tu joues, tes rôles favoris
+            et ton niveau par jeu.
+          </p>
+
+          <div class="why-grid">
+            <div class="why-card">
+              <div class="why-title">Ajoute tes jeux</div>
+              <div class="why-text">
+                Plus tard, tu pourras lister ici les jeux auxquels tu joues et ton niveau
+                pour améliorer les recommandations de coéquipiers.
+              </div>
+            </div>
+
+            <div class="why-card">
+              <div class="why-title">Définis ton style</div>
+              <div class="why-text">
+                Tryhard, chill, fun, compétitif… indique ton style pour matcher
+                avec les bonnes personnes.
+              </div>
+            </div>
+
+            <div class="why-card">
+              <div class="why-title">Groupes & teams</div>
+              <div class="why-text">
+                Retrouve ici tes équipes fixes, groupes Discord, et futures features de
+                matchmaking.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="parametres" style="margin-top: 40px;">
+          <h2 class="section-title">Paramètres du compte</h2>
+          <p class="section-subtitle">
+            Plus tard : changer ton email, ton mot de passe, ton pseudo, gérer la sécurité
+            et les notifications.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-links">
+        <a href="#">À propos</a>
+        <a href="#">Contact</a>
+        <a href="#">Conditions d’utilisation</a>
+        <a href="#">Confidentialité</a>
+      </div>
+
+      <div class="footer-socials">
+        <div class="footer-pill">Rejoindre le Discord</div>
+        <div class="footer-pill">Twitter</div>
+        <div class="footer-pill">Instagram</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Script pour récupérer les infos du joueur connecté -->
+  <script>
+  fetch('/api/me')
+    .then(async (res) => {
+      // Si pas connecté → on redirige vers la page de connexion
+      if (res.status === 401) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!data.loggedIn) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      // Ici tu peux remplir le profil avec les infos renvoyées
+      // Exemple si tu as des spans avec des IDs :
+      const nameElt = document.getElementById("profile-username");
+      const emailElt = document.getElementById("profile-email");
+      const memberSinceElt = document.getElementById("profile-created");
+
+      if (nameElt) nameElt.textContent = data.username;
+      if (emailElt) emailElt.textContent = data.email;
+      if (memberSinceElt) memberSinceElt.textContent = data.created_at?.slice(0, 10);
+    })
+    .catch((err) => {
+      console.error("Erreur /api/me :", err);
+      // En cas d’erreur réseau, tu peux soit rester sur la page,
+      // soit décider de renvoyer vers login si tu veux :
+      // window.location.href = '/login.html';
+    });
+</script>
+
+<script src="animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Minimal</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial;
+      padding: 50px;
+      font-size: 20px;
+    }
+    .box {
+      background: red;
+      padding: 50px;
+      margin: 20px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .box:hover {
+      background: orange;
+    }
+  </style>
+</head>
+<body>
+  <h1>TEST ULTRA SIMPLE</h1>
+  <p>Si vous voyez "CLIC OK" en vert après avoir cliqué, ça fonctionne!</p>
+
+  <div class="box" onclick="test1()">CLIQUEZ ICI (méthode 1)</div>
+
+  <div class="box" id="box2">CLIQUEZ ICI (méthode 2)</div>
+
+  <button style="padding: 30px; font-size: 24px; cursor: pointer;" onclick="test3()">
+    BOUTON TEST
+  </button>
+
+  <h2 id="result" style="color: red;">EN ATTENTE DE CLIC...</h2>
+
+  <script>
+    console.log('Script chargé');
+
+    function test1() {
+      console.log('test1() appelée');
+      alert('TEST 1 OK - onclick dans HTML');
+      document.getElementById('result').textContent = 'CLIC OK (méthode 1)';
+      document.getElementById('result').style.color = 'green';
+    }
+
+    function test3() {
+      console.log('test3() appelée');
+      alert('TEST 3 OK - bouton avec onclick');
+      document.getElementById('result').textContent = 'CLIC OK (bouton)';
+      document.getElementById('result').style.color = 'green';
+    }
+
+    // Méthode 2: addEventListener
+    document.getElementById('box2').addEventListener('click', function() {
+      console.log('addEventListener déclenché');
+      alert('TEST 2 OK - addEventListener');
+      document.getElementById('result').textContent = 'CLIC OK (méthode 2)';
+      document.getElementById('result').style.color = 'green';
+    });
+
+    console.log('Listeners attachés');
+  </script>
+</body>
+</html>

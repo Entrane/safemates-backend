@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Debug - Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .test-section {
+      background: #2a2a2a;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #16a34a;
+    }
+    .rank-option {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px;
+      border: 2px solid #444;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .rank-option.active {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.2);
+    }
+    .rank-option img {
+      width: 60px;
+      height: 60px;
+      display: block;
+    }
+    #console {
+      background: #000;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+    }
+    .log-success { color: #22c55e; }
+    .log-error { color: #ef4444; }
+    .log-info { color: #3b82f6; }
+  </style>
+</head>
+<body>
+  <h1>🔧 Test de Debug - Page Game</h1>
+
+  <div class="test-section">
+    <h2>1. Test Token JWT</h2>
+    <p id="tokenStatus">Vérification...</p>
+    <button onclick="testToken()">Tester Token</button>
+  </div>
+
+  <div class="test-section">
+    <h2>2. Test Sélection de Rang</h2>
+    <div id="rankTest">
+      <div class="rank-option" data-rank-id="fer1" onclick="testSelectRank('fer1')">
+        <img src="/Valorant_rank/Iron_1_Rank.webp" alt="Fer 1">
+        <span>Fer 1</span>
+      </div>
+      <div class="rank-option" data-rank-id="bronze1" onclick="testSelectRank('bronze1')">
+        <img src="/Valorant_rank/Bronze_1_Rank.webp" alt="Bronze 1">
+        <span>Bronze 1</span>
+      </div>
+      <div class="rank-option" data-rank-id="argent1" onclick="testSelectRank('argent1')">
+        <img src="/Valorant_rank/Silver_1_Rank.webp" alt="Argent 1">
+        <span>Argent 1</span>
+      </div>
+    </div>
+    <p>Rang sélectionné: <span id="selectedRank">Aucun</span></p>
+  </div>
+
+  <div class="test-section">
+    <h2>3. Test Sauvegarde</h2>
+    <button onclick="testSaveSettings()">Tester Sauvegarde</button>
+    <p id="saveResult"></p>
+  </div>
+
+  <div class="test-section">
+    <h2>4. Test Recherche Partenaire</h2>
+    <button onclick="testSearch()">Tester Recherche</button>
+    <p id="searchResult"></p>
+  </div>
+
+  <div class="test-section">
+    <h2>📋 Console de Debug</h2>
+    <button onclick="clearConsole()">Effacer Console</button>
+    <div id="console"></div>
+  </div>
+
+  <script>
+    // Variables globales
+    let selectedRank = null;
+    const gameId = 'valorant';
+
+    // Fonction de log
+    function log(message, type = 'info') {
+      const consoleEl = document.getElementById('console');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      consoleEl.appendChild(entry);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+      console.log(message);
+    }
+
+    function clearConsole() {
+      document.getElementById('console').innerHTML = '';
+    }
+
+    // Test 1: Vérifier le token
+    function testToken() {
+      const token = localStorage.getItem('token');
+      const username = localStorage.getItem('username');
+      const statusEl = document.getElementById('tokenStatus');
+
+      if (token) {
+        statusEl.innerHTML = `✅ Token trouvé<br>Username: ${username || 'Non trouvé'}`;
+        statusEl.style.color = '#22c55e';
+        log(`Token JWT présent (${token.substring(0, 20)}...)`, 'success');
+      } else {
+        statusEl.innerHTML = '❌ Aucun token trouvé - Vous devez vous connecter';
+        statusEl.style.color = '#ef4444';
+        log('Aucun token JWT trouvé', 'error');
+      }
+    }
+
+    // Test 2: Sélection de rang
+    function testSelectRank(rankId) {
+      log(`Tentative de sélection du rang: ${rankId}`, 'info');
+      selectedRank = rankId;
+
+      // Mise à jour visuelle
+      document.querySelectorAll('.rank-option').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.querySelector(`[data-rank-id="${rankId}"]`).classList.add('active');
+
+      document.getElementById('selectedRank').textContent = rankId;
+      log(`Rang sélectionné avec succès: ${rankId}`, 'success');
+    }
+
+    // Test 3: Sauvegarde
+    async function testSaveSettings() {
+      log('=== DÉBUT TEST SAUVEGARDE ===', 'info');
+      const resultEl = document.getElementById('saveResult');
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        resultEl.textContent = '❌ Pas de token - Connectez-vous d\'abord';
+        log('Échec: Pas de token JWT', 'error');
+        return;
+      }
+
+      if (!selectedRank) {
+        resultEl.textContent = '❌ Sélectionnez un rang d\'abord';
+        log('Échec: Aucun rang sélectionné', 'error');
+        return;
+      }
+
+      const payload = {
+        gameId: gameId,
+        rank: selectedRank,
+        mainMode: 'Classé',
+        options: []
+      };
+
+      log(`Envoi des données: ${JSON.stringify(payload)}`, 'info');
+
+      try {
+        const response = await fetch('/api/game/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        log(`Réponse HTTP: ${response.status} ${response.statusText}`, 'info');
+
+        if (response.ok) {
+          const data = await response.json();
+          resultEl.textContent = '✅ Sauvegarde réussie!';
+          resultEl.style.color = '#22c55e';
+          log(`Succès: ${JSON.stringify(data)}`, 'success');
+        } else {
+          const error = await response.text();
+          resultEl.textContent = `❌ Erreur ${response.status}`;
+          resultEl.style.color = '#ef4444';
+          log(`Erreur ${response.status}: ${error}`, 'error');
+        }
+      } catch (err) {
+        resultEl.textContent = `❌ Erreur: ${err.message}`;
+        log(`Erreur réseau: ${err.message}`, 'error');
+      }
+
+      log('=== FIN TEST SAUVEGARDE ===', 'info');
+    }
+
+    // Test 4: Recherche
+    async function testSearch() {
+      log('=== DÉBUT TEST RECHERCHE ===', 'info');
+      const resultEl = document.getElementById('searchResult');
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        resultEl.textContent = '❌ Pas de token - Connectez-vous d\'abord';
+        log('Échec: Pas de token JWT', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/match/search/${gameId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        log(`Réponse HTTP: ${response.status} ${response.statusText}`, 'info');
+
+        if (response.ok) {
+          const matches = await response.json();
+          resultEl.textContent = `✅ ${matches.length} partenaire(s) trouvé(s)`;
+          resultEl.style.color = '#22c55e';
+          log(`Succès: ${matches.length} matchs trouvés`, 'success');
+          log(`Détails: ${JSON.stringify(matches)}`, 'info');
+        } else {
+          const error = await response.text();
+          resultEl.textContent = `❌ Erreur ${response.status}`;
+          resultEl.style.color = '#ef4444';
+          log(`Erreur ${response.status}: ${error}`, 'error');
+        }
+      } catch (err) {
+        resultEl.textContent = `❌ Erreur: ${err.message}`;
+        log(`Erreur réseau: ${err.message}`, 'error');
+      }
+
+      log('=== FIN TEST RECHERCHE ===', 'info');
+    }
+
+    // Initialisation
+    window.onload = function() {
+      log('Page de debug chargée', 'success');
+      testToken();
+    };
+  </script>
+</body>
+</html>

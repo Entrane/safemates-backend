@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnostic - Bouton Amis</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0f172a;
+            color: #f1f5f9;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #1e293b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
+        }
+        .test-title {
+            color: #22c55e;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        button {
+            background: #22c55e;
+            color: #0f172a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        pre {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .sidebar-test {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100vh;
+            background: rgba(10, 15, 30, 0.98);
+            transition: right 0.4s;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .sidebar-test.active {
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnostic du bouton Amis - Dashboard</h1>
+
+    <div class="test-section">
+        <div class="test-title">1. Test de l'API d'authentification</div>
+        <button onclick="testAuth()">Tester l'authentification</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">2. Test de l'API des amis</div>
+        <button onclick="testFriendsAPI()">Tester /api/friends</button>
+        <div id="friends-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">3. Test du localStorage</div>
+        <button onclick="testLocalStorage()">Vérifier le localStorage</button>
+        <div id="storage-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">4. Test de la sidebar (simulation)</div>
+        <button onclick="testSidebarToggle()">Tester l'animation de la sidebar</button>
+        <div id="sidebar-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">5. Test des événements JavaScript</div>
+        <button onclick="testEventListeners()">Tester les événements</button>
+        <div id="events-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">6. Test des éléments DOM</div>
+        <button onclick="testDOMElements()">Vérifier les éléments DOM</button>
+        <div id="dom-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">7. Recommandations</div>
+        <button onclick="showRecommendations()">Voir les solutions</button>
+        <div id="recommendations"></div>
+    </div>
+
+    <!-- Sidebar de test -->
+    <div class="sidebar-test" id="testSidebar">
+        <h3 style="color: #22c55e;">Test Sidebar</h3>
+        <p>Cette sidebar devrait glisser depuis la droite</p>
+        <button onclick="closeSidebar()">Fermer</button>
+    </div>
+
+    <script>
+        // Fonction pour obtenir le token
+        function getAuthHeader() {
+            const token = localStorage.getItem('token');
+            return token ? { 'Authorization': `Bearer ${token}` } : {};
+        }
+
+        // Test 1: Authentification
+        async function testAuth() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Aucun token trouvé dans le localStorage</p>
+                    <p class="warning">⚠️ Vous devez vous connecter d'abord</p>
+                    <p>👉 <a href="/login.html" style="color: #22c55e;">Aller à la page de connexion</a></p>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user/profile', {
+                    headers: getAuthHeader()
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Authentification réussie</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Erreur ${response.status}: ${response.statusText}</p>
+                        <p class="warning">⚠️ Le token est peut-être expiré</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Erreur: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Test 2: API des amis
+        async function testFriendsAPI() {
+            const resultDiv = document.getElementById('friends-result');
+            resultDiv.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            try {
+                const response = await fetch('/api/friends', {
+                    headers: getAuthHeader()
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ API des amis fonctionne</p>
+                        <p>📊 Amis: ${data.friends?.length || 0}</p>
+                        <p>📨 Demandes reçues: ${data.incomingRequests?.length || 0}</p>
+                        <p>📤 Demandes envoyées: ${data.outgoingRequests?.length || 0}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Erreur ${response.status}: ${response.statusText}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Erreur: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Test 3: localStorage
+        function testLocalStorage() {
+            const resultDiv = document.getElementById('storage-result');
+            const keys = ['token', 'username', 'socialSidebarActive', 'mm_friends_data'];
+
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="border-bottom: 1px solid #334155;"><th style="text-align: left; padding: 5px;">Clé</th><th style="text-align: left; padding: 5px;">Valeur</th></tr>';
+
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                const status = value ? '<span class="success">✅</span>' : '<span class="error">❌</span>';
+                const displayValue = value ? (value.length > 50 ? value.substring(0, 50) + '...' : value) : 'Non défini';
+                html += `<tr><td style="padding: 5px;">${status} ${key}</td><td style="padding: 5px; font-family: monospace;">${displayValue}</td></tr>`;
+            });
+
+            html += '</table>';
+            resultDiv.innerHTML = html;
+        }
+
+        // Test 4: Sidebar toggle
+        function testSidebarToggle() {
+            const sidebar = document.getElementById('testSidebar');
+            sidebar.classList.add('active');
+
+            const resultDiv = document.getElementById('sidebar-result');
+            resultDiv.innerHTML = `
+                <p class="success">✅ Sidebar de test ouverte</p>
+                <p>Si vous voyez une sidebar glisser depuis la droite, l'animation CSS fonctionne</p>
+            `;
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('testSidebar');
+            sidebar.classList.remove('active');
+        }
+
+        // Test 5: Event listeners
+        function testEventListeners() {
+            const resultDiv = document.getElementById('events-result');
+
+            // Créer un bouton de test
+            const testBtn = document.createElement('button');
+            testBtn.textContent = 'Bouton de test';
+            testBtn.style.marginTop = '10px';
+
+            let clickCount = 0;
+            testBtn.addEventListener('click', function() {
+                clickCount++;
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Les événements JavaScript fonctionnent</p>
+                    <p>Clics enregistrés: ${clickCount}</p>
+                `;
+            });
+
+            resultDiv.innerHTML = '<p>Cliquez sur le bouton ci-dessous pour tester:</p>';
+            resultDiv.appendChild(testBtn);
+        }
+
+        // Test 6: Éléments DOM
+        function testDOMElements() {
+            const resultDiv = document.getElementById('dom-result');
+
+            // Simuler la vérification du dashboard
+            const elementsToCheck = [
+                'friendsSidebar',
+                'friendsList',
+                'add-friend-form',
+                'friendsCount',
+                'chat-container'
+            ];
+
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="border-bottom: 1px solid #334155;"><th style="text-align: left; padding: 5px;">Élément</th><th style="text-align: left; padding: 5px;">Statut</th></tr>';
+
+            elementsToCheck.forEach(id => {
+                // Note: Ces éléments n'existent pas dans cette page de diagnostic
+                const exists = false; // Dans le vrai dashboard, ce serait: document.getElementById(id) !== null
+                const status = exists ? '<span class="success">✅ Trouvé</span>' : '<span class="warning">⚠️ À vérifier dans dashboard.html</span>';
+                html += `<tr><td style="padding: 5px;">${id}</td><td style="padding: 5px;">${status}</td></tr>`;
+            });
+
+            html += '</table>';
+            html += '<p class="warning">⚠️ Ces éléments doivent être vérifiés dans le dashboard.html réel</p>';
+
+            resultDiv.innerHTML = html;
+        }
+
+        // Test 7: Recommandations
+        function showRecommendations() {
+            const resultDiv = document.getElementById('recommendations');
+
+            resultDiv.innerHTML = `
+                <h3>🔧 Solutions possibles :</h3>
+
+                <h4>1. Vérifier la console du navigateur (F12)</h4>
+                <p>Ouvrez le dashboard et appuyez sur F12 pour voir les erreurs JavaScript</p>
+
+                <h4>2. Vérifier l'authentification</h4>
+                <p>Assurez-vous d'être connecté avec un token valide</p>
+                <pre>localStorage.getItem('token')</pre>
+
+                <h4>3. Vérifier que le bouton est cliquable</h4>
+                <p>Le bouton doit avoir ces propriétés CSS:</p>
+                <pre>pointer-events: auto;
+z-index: 10000;
+cursor: pointer;</pre>
+
+                <h4>4. Vérifier l'ordre de chargement des scripts</h4>
+                <p>Les scripts doivent être dans cet ordre:</p>
+                <pre>1. chatmanager.js
+2. Script principal avec toggleSidebar()</pre>
+
+                <h4>5. Tester manuellement dans la console</h4>
+                <p>Dans la console du dashboard, tapez:</p>
+                <pre>toggleSidebar()</pre>
+
+                <h4>6. Vérifier la variable CSS</h4>
+                <pre>--sidebar-width: 320px;</pre>
+
+                <h4>7. Forcer le rafraîchissement</h4>
+                <p>Appuyez sur Ctrl+Shift+R pour vider le cache</p>
+
+                <h4>8. Code de correction rapide</h4>
+                <p>Ajoutez onclick directement dans le HTML:</p>
+                <pre>&lt;button class="toggle-friends-btn" onclick="toggleSidebar()"&gt;
+    &lt;i class="fas fa-users"&gt;&lt;/i&gt; &lt;span&gt;Amis&lt;/span&gt;
+&lt;/button&gt;</pre>
+            `;
+        }
+
+        // Auto-test au chargement
+        window.addEventListener('load', function() {
+            console.log('📋 Page de diagnostic chargée');
+            console.log('Token:', localStorage.getItem('token') ? '✅ Présent' : '❌ Absent');
+            console.log('Username:', localStorage.getItem('username') || '❌ Absent');
+        });
+    </script>
+</body>
+</html>

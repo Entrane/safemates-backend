@@ -1,0 +1,194 @@
+# ================================================
+# Configuration .htaccess pour MatchMates PHP
+# Version pour hébergement Hostinger classique
+# ================================================
+
+# ================================================
+# SÉCURITÉ
+# ================================================
+
+# Empêcher l'affichage du répertoire
+Options -Indexes
+
+# Bloquer l'accès aux fichiers sensibles
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(env|sqlite|db|log|md|sql|bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protection XSS et autres headers de sécurité
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # CORS pour les API PHP
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# ================================================
+# REDIRECTIONS ET RÉÉCRITURE D'URL
+# ================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Forcer HTTPS (si disponible)
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Rediriger www vers non-www (ou inversement)
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # Réécriture des URLs d'API
+    # /signup => /api/signup.php
+    RewriteRule ^signup$ /api/signup.php [L]
+    RewriteRule ^login$ /api/login.php [L]
+
+    # /api/match/search/{game} => /api/match/search.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/match/search/([a-zA-Z0-9_-]+)$ /api/match/search.php [L]
+
+    # /api/game/* => /api/game/*.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/game/([a-zA-Z0-9_-]+)$ /api/game/$1.php [L]
+
+    # /api/* => /api/*.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/([a-zA-Z0-9_-]+)$ /api/$1.php [L]
+
+    # /dashboard => /dashboard.html
+    RewriteRule ^dashboard$ /dashboard.html [L]
+    RewriteRule ^moderation$ /moderation.html [L]
+
+    # /game/* => /game.html (pour tous les jeux)
+    RewriteRule ^game/(.*)$ /game.html [L]
+
+    # Rediriger /register vers /signup.html
+    RewriteRule ^register$ /signup.html [R=301,L]
+</IfModule>
+
+# ================================================
+# COMPRESSION GZIP
+# ================================================
+
+<IfModule mod_deflate.c>
+    # Compresser HTML, CSS, JavaScript, Text, XML et fontes
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+</IfModule>
+
+# ================================================
+# MISE EN CACHE DES RESSOURCES
+# ================================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Images
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # CSS et JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+
+    # Fonts
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+
+    # HTML
+    ExpiresByType text/html "access plus 1 hour"
+
+    # Par défaut
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# ================================================
+# EN-TÊTES DE CACHE
+# ================================================
+
+<IfModule mod_headers.c>
+    # Cache pour 1 an pour les ressources statiques
+    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|svg|js|css|swf|woff|woff2|ttf|otf)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+
+    # Cache pour 1 jour pour HTML
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "max-age=86400, public, must-revalidate"
+    </FilesMatch>
+
+    # Désactiver le cache pour les API PHP
+    <FilesMatch "\.php$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires 0
+    </FilesMatch>
+</IfModule>
+
+# ================================================
+# PAGES D'ERREUR PERSONNALISÉES
+# ================================================
+
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# ================================================
+# PHP CONFIGURATION
+# ================================================
+
+<IfModule mod_php.c>
+    # Augmenter la limite de mémoire si nécessaire
+    php_value memory_limit 128M
+
+    # Augmenter la taille maximale des uploads
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+
+    # Désactiver l'affichage des erreurs en production
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>

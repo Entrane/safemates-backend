@@ -1,0 +1,104 @@
+═══════════════════════════════════════════════════════════
+  LISTE DES FICHIERS À UPLOADER SUR HOSTINGER
+═══════════════════════════════════════════════════════════
+
+✅ FICHIERS HTML (Uploadez TOUS ces fichiers)
+───────────────────────────────────────────────────────────
+  index.html
+  signup.html
+  login.html
+  dashboard.html
+  game.html
+  moderation.html
+  contact.html
+  profile.html
+  404.html
+  500.html
+  test-api.html          ← NOUVEAU : Pour tester les APIs
+
+✅ FICHIERS CSS (Uploadez TOUS ces fichiers)
+───────────────────────────────────────────────────────────
+  style.css
+  style-enhanced.css
+  components.css
+  ads.css
+
+✅ FICHIERS JAVASCRIPT (Uploadez TOUS ces fichiers)
+───────────────────────────────────────────────────────────
+  animations.js
+  service-worker.js
+
+✅ DOSSIER API/ (Uploadez TOUT le dossier) ⭐ IMPORTANT !
+───────────────────────────────────────────────────────────
+  api/
+  ├── config.php         ← À CONFIGURER avec vos infos BDD
+  ├── signup.php
+  ├── login.php
+  ├── health.php
+  ├── check-setup.php    ← 🆕 Pour diagnostiquer les problèmes
+  ├── install.php        ← À SUPPRIMER après installation
+  ├── get-profile.php
+  ├── save-profile.php
+  ├── game/
+  │   ├── settings.php
+  │   └── preferences.php
+  └── match/
+      └── search.php     ← 🆕 API de recherche de partenaires
+
+✅ DOSSIER IMAGE/ (Uploadez TOUT le dossier)
+───────────────────────────────────────────────────────────
+  Image/
+  ├── Image_jeux/        (tous les fichiers .jpg, .png, .webp)
+  ├── valorant_rank/
+  ├── lol_rank/
+  ├── csgo_rank/
+  ├── fortnite rank/
+  ├── rocketleague_rank/
+  └── warzone_rank/
+
+✅ FICHIER DE CONFIGURATION
+───────────────────────────────────────────────────────────
+  .htaccess             ← Configuration Apache/PHP
+
+✅ FICHIERS DIVERS
+───────────────────────────────────────────────────────────
+  manifest.json
+  robots.txt
+  sitemap.xml
+
+═══════════════════════════════════════════════════════════
+
+❌ FICHIERS À NE PAS UPLOADER (Node.js - inutiles)
+───────────────────────────────────────────────────────────
+  ✘ server.js
+  ✘ app.js
+  ✘ package.json
+  ✘ package-lock.json
+  ✘ node_modules/ (dossier complet)
+  ✘ database.sqlite
+  ✘ *.js (sauf animations.js et service-worker.js)
+  ✘ *.md (documentation)
+  ✘ logs/ (dossier complet)
+
+═══════════════════════════════════════════════════════════
+
+📊 RÉSUMÉ
+───────────────────────────────────────────────────────────
+  Fichiers HTML :     11 fichiers
+  Fichiers CSS :       4 fichiers
+  Fichiers JS :        2 fichiers
+  Dossier API :        1 dossier (5 fichiers PHP)
+  Dossier Images :     1 dossier (avec sous-dossiers)
+  Configuration :      3 fichiers (.htaccess, manifest, robots)
+
+═══════════════════════════════════════════════════════════
+
+📝 APRÈS L'UPLOAD
+───────────────────────────────────────────────────────────
+  1. Éditez api/config.php avec vos infos MySQL
+  2. Ouvrez /api/install.php?password=matchmates2024
+  3. Supprimez api/install.php
+  4. Testez /test-api.html
+  5. Testez votre site !
+
+═══════════════════════════════════════════════════════════

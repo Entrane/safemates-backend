@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Boutons Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .log {
+            background: #2a2a2a;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Simple des Boutons</h1>
+    <p>Ce test vérifie si les boutons de game.html répondent correctement.</p>
+
+    <h2>Test 1: Fonctions globales</h2>
+    <button onclick="testFunctions()">Tester les fonctions window.*</button>
+    <div id="result1" class="log"></div>
+
+    <h2>Test 2: Clic direct</h2>
+    <button onclick="testDirectClick()">Simuler clic sur bouton</button>
+    <div id="result2" class="log"></div>
+
+    <h2>Test 3: DOM Ready</h2>
+    <button onclick="testDOMElements()">Vérifier éléments DOM dans game.html</button>
+    <div id="result3" class="log"></div>
+
+    <h2>Test 4: Token localStorage</h2>
+    <button onclick="testToken()">Vérifier token</button>
+    <div id="result4" class="log"></div>
+
+    <h2>Instructions</h2>
+    <div class="log">
+        <p><strong>Pour tester sur la vraie page :</strong></p>
+        <ol>
+            <li>Ouvrir <a href="/csgo" style="color: #4CAF50;">http://localhost:3000/csgo</a></li>
+            <li>Appuyer sur <strong>F12</strong> pour ouvrir la console</li>
+            <li>Coller ces commandes :</li>
+        </ol>
+        <pre style="background: #1a1a1a; padding: 10px; border-radius: 3px;">
+// Test 1: Vérifier que les fonctions existent
+console.log('saveGameSettings:', typeof window.saveGameSettings);
+console.log('toggleSearch:', typeof window.toggleSearch);
+
+// Test 2: Vérifier les boutons dans le DOM
+const updateBtn = document.querySelector('.update-btn');
+const searchBtn = document.getElementById('partnerSearchButton');
+console.log('Bouton update:', updateBtn);
+console.log('Bouton search:', searchBtn);
+
+// Test 3: Vérifier userGameData
+console.log('userGameData:', userGameData);
+
+// Test 4: Tester manuellement
+saveGameSettings();  // Devrait afficher log ou alert
+toggleSearch();      // Devrait afficher log ou alert
+        </pre>
+    </div>
+
+    <script>
+        function testFunctions() {
+            const result = document.getElementById('result1');
+            let html = '<h3>Résultat:</h3>';
+
+            // Sur cette page de test, les fonctions n'existent pas
+            // Mais on peut tester s'il y a des erreurs
+            html += '<p class="warning">⚠️ Ces fonctions n\'existent que dans game.html</p>';
+            html += '<p>Pour tester, ouvrez game.html et tapez dans la console (F12) :</p>';
+            html += '<pre>console.log(typeof window.saveGameSettings);\nconsole.log(typeof window.toggleSearch);</pre>';
+            html += '<p class="success">✅ Devrait afficher "function" deux fois</p>';
+
+            result.innerHTML = html;
+        }
+
+        function testDirectClick() {
+            const result = document.getElementById('result2');
+            let html = '<h3>Résultat:</h3>';
+
+            html += '<p>Sur la page game.html, les boutons sont :</p>';
+            html += '<pre>&lt;button class="update-btn" onclick="saveGameSettings()"&gt;\n&lt;button id="partnerSearchButton" onclick="toggleSearch()"&gt;</pre>';
+            html += '<p class="warning">⚠️ Si rien ne se passe au clic :</p>';
+            html += '<ul>';
+            html += '<li>Fonction pas définie (erreur JavaScript)</li>';
+            html += '<li>onclick pas attaché correctement</li>';
+            html += '<li>Erreur silencieuse dans la fonction</li>';
+            html += '</ul>';
+            html += '<p>Ouvrez la console (F12) sur game.html pour voir les erreurs</p>';
+
+            result.innerHTML = html;
+        }
+
+        function testDOMElements() {
+            const result = document.getElementById('result3');
+            let html = '<h3>Dans la console de game.html, tapez :</h3>';
+            html += '<pre>';
+            html += 'const updateBtn = document.querySelector(\\'.update-btn\\');\n';
+            html += 'console.log(\\'Bouton update:\\', updateBtn);\n';
+            html += 'console.log(\\'onclick:\\', updateBtn.onclick);\n\n';
+            html += 'const searchBtn = document.getElementById(\\'partnerSearchButton\\');\n';
+            html += 'console.log(\\'Bouton search:\\', searchBtn);\n';
+            html += 'console.log(\\'onclick:\\', searchBtn.onclick);\n';
+            html += '</pre>';
+            html += '<p class="success">✅ Si les boutons existent, vous verrez les éléments HTML</p>';
+            html += '<p class="error">❌ Si null, problème de DOM ou de sélecteur</p>';
+
+            result.innerHTML = html;
+        }
+
+        function testToken() {
+            const result = document.getElementById('result4');
+            const token = localStorage.getItem('token');
+            let html = '<h3>Token localStorage:</h3>';
+
+            if (token) {
+                html += '<p class="success">✅ Token trouvé: ' + token.substring(0, 20) + '...</p>';
+                html += '<p>Vous êtes connecté.</p>';
+            } else {
+                html += '<p class="error">❌ Pas de token trouvé</p>';
+                html += '<p class="warning">⚠️ PROBLÈME : Vous devez être connecté pour que les boutons fonctionnent !</p>';
+                html += '<p>1. Allez sur <a href="/login.html" style="color: #4CAF50;">/login.html</a></p>';
+                html += '<p>2. Connectez-vous avec votre compte</p>';
+                html += '<p>3. Retournez sur game.html</p>';
+            }
+
+            result.innerHTML = html;
+        }
+
+        // Auto-test au chargement
+        window.addEventListener('load', function() {
+            console.log('✅ Page de test chargée');
+            console.log('🔍 Pour tester game.html, ouvrez la console sur cette page');
+            testToken(); // Test automatique du token
+        });
+    </script>
+</body>
+</html>

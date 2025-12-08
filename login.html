@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F7J6VTB5BZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-F7J6VTB5BZ');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SEO Meta Tags -->
+  <title>Connexion - SafeMates | Plateforme Gaming Féminine</title>
+  <meta name="description" content="Connectez-vous à SafeMates, la plateforme de matchmaking gaming 100% féminine. Retrouvez vos coéquipières et jouez dans un espace sécurisé." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="https://www.SafeMates.fr/login.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Connexion - SafeMates" />
+  <meta property="og:description" content="Connectez-vous à votre compte SafeMates" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.SafeMates.fr/login.html" />
+
+  <!-- Police Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Ton fichier CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-enhanced.css" />
+  <link rel="stylesheet" href="components.css" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5W9WJ9ZKEK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5W9WJ9ZKEK');
+  </script>
+</head>
+
+<body>
+  <div class="page-wrapper">
+
+    <!-- HEADER -->
+      <header>
+        <div class="logo">
+          <img src="Image/Image_jeux/a230f9f5-6918-4f03-9c70-1a27399bfa08.png" alt="SafeMates" class="logo-img">
+          <div class="logo-text">SafeMates</div>
+        </div>
+
+      <nav>
+        <a href="index.html">Accueil</a>
+        <a href="#">Jeux</a>
+        <a href="#">Communauté</a>
+
+        <div class="nav-cta">
+          <a class="btn btn-outline" href="login.html">Connexion</a>
+          <a class="btn btn-primary" href="signup.html">Inscription</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- FORMULAIRE DE CONNEXION -->
+    <main>
+      <section style="max-width: 420px; margin: 40px auto;" data-animate>
+
+        <h1 class="section-title">Connexion</h1>
+        <p class="section-subtitle">
+          Heureux de vous revoir ! Connectez-vous pour retrouver vos coéquipiers.
+        </p>
+
+        <form action="/login" method="POST" class="login-form"
+          style="display: flex; flex-direction: column; gap: 16px;
+          background: rgba(15,23,42,0.95); padding: 22px;
+          border-radius: 16px; border: 1px solid rgba(55,65,81,0.8);
+          box-shadow: var(--shadow-soft);">
+
+          <!-- Identifiant : email OU username -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="email" style="font-size: 13px;">Adresse e-mail</label>
+            <input id="email" name="email" type="email" required
+              class="hero-input"
+              placeholder="Ex : joueur@example.com">
+          </div>
+
+          <!-- Mot de passe -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="password" style="font-size: 13px;">Mot de passe</label>
+            <input id="password" name="password" type="password" required
+              class="hero-input"
+              placeholder="Votre mot de passe">
+          </div>
+
+          <a href="#" style="font-size: 12px; color: var(--accent); text-align: right;">
+            Mot de passe oublié ?
+          </a>
+
+          <!-- Bouton -->
+          <button type="submit" class="btn btn-primary hero-btn-cta"
+            style="margin-top: 10px; width: 100%; justify-content: center;">
+            Se connecter
+          </button>
+
+          <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 4px;">
+            Pas encore de compte ?
+            <a href="/register" style="color: var(--accent);">Créer un compte</a>
+          </p>
+
+        </form>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-links">
+        <a href="#">À propos</a>
+        <a href="#">Contact</a>
+        <a href="#">Conditions d’utilisation</a>
+        <a href="#">Confidentialité</a>
+      </div>
+
+      <div class="footer-socials">
+        <div class="footer-pill">Rejoindre le Discord</div>
+        <div class="footer-pill">Twitter</div>
+        <div class="footer-pill">Instagram</div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="animations.js"></script>
+  <script>
+// Gestion du formulaire de connexion
+document.querySelector('.login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const data = {
+    email: formData.get('email'),
+    password: formData.get('password')
+  };
+
+  try {
+    const response = await fetch('/api/login.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    
+    if (response.ok) {
+      // Stocker le token et rediriger
+      localStorage.setItem('token', result.token);
+      localStorage.setItem('username', result.user.username);
+      localStorage.setItem('user_id', result.user.id);
+      if (result.user.isAdmin) {
+        localStorage.setItem('isAdmin', 'true');
+      }
+      window.location.href = '/dashboard';
+    } else {
+      if (typeof window.showToast === 'function') {
+        window.showToast('Erreur: ' + (result.error || 'Identifiants incorrects'), 'error');
+      } else {
+        alert('Erreur: ' + (result.error || 'Identifiants incorrects'));
+      }
+    }
+  } catch (error) {
+    if (typeof window.showToast === 'function') {
+      window.showToast('Erreur de connexion au serveur', 'error');
+    } else {
+      alert('Erreur de connexion au serveur');
+    }
+  }
+});
+</script>
+</body>
+</html>

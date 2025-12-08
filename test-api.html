@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API MatchMates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #16a34a;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #22c55e;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #ef4444;
+            color: #dc2626;
+        }
+        .success {
+            border-left-color: #22c55e;
+            color: #16a34a;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test des APIs MatchMates PHP</h1>
+
+    <div class="test-section">
+        <h2>1. Test de santé de l'API</h2>
+        <button onclick="testHealth()">Tester /api/health.php</button>
+        <div id="health-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test d'inscription</h2>
+        <input type="text" id="signup-username" placeholder="Username" value="testuser">
+        <input type="email" id="signup-email" placeholder="Email" value="test@example.com">
+        <input type="password" id="signup-password" placeholder="Password" value="test123">
+        <br>
+        <button onclick="testSignup()">Tester Inscription</button>
+        <div id="signup-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test de connexion</h2>
+        <input type="text" id="login-username" placeholder="Username ou Email" value="testuser">
+        <input type="password" id="login-password" placeholder="Password" value="test123">
+        <br>
+        <button onclick="testLogin()">Tester Connexion</button>
+        <div id="login-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Informations stockées</h2>
+        <button onclick="showLocalStorage()">Voir LocalStorage</button>
+        <button onclick="clearLocalStorage()">Vider LocalStorage</button>
+        <div id="storage-result" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Test en cours...';
+
+            try {
+                const response = await fetch('/api/health.php');
+                const data = await response.json();
+
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ Succès!\n\nStatus: ${response.status}\n\n` + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Erreur!\n\n${error.message}`;
+            }
+        }
+
+        async function testSignup() {
+            const resultDiv = document.getElementById('signup-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Test en cours...';
+
+            const data = {
+                username: document.getElementById('signup-username').value,
+                email: document.getElementById('signup-email').value,
+                password: document.getElementById('signup-password').value
+            };
+
+            try {
+                const response = await fetch('/api/signup.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Succès!\n\nStatus: ${response.status}\n\n` + JSON.stringify(result, null, 2);
+
+                    // Stocker le token
+                    if (result.token) {
+                        localStorage.setItem('token', result.token);
+                        localStorage.setItem('username', result.user.username);
+                        localStorage.setItem('user_id', result.user.id);
+                    }
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Erreur ${response.status}!\n\n` + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Erreur de connexion!\n\n${error.message}`;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Test en cours...';
+
+            const data = {
+                username: document.getElementById('login-username').value,
+                password: document.getElementById('login-password').value
+            };
+
+            try {
+                const response = await fetch('/api/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Succès!\n\nStatus: ${response.status}\n\n` + JSON.stringify(result, null, 2);
+
+                    // Stocker le token
+                    if (result.token) {
+                        localStorage.setItem('token', result.token);
+                        localStorage.setItem('username', result.user.username);
+                        localStorage.setItem('user_id', result.user.id);
+                        if (result.user.isAdmin) {
+                            localStorage.setItem('isAdmin', 'true');
+                        }
+                    }
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Erreur ${response.status}!\n\n` + JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Erreur de connexion!\n\n${error.message}`;
+            }
+        }
+
+        function showLocalStorage() {
+            const resultDiv = document.getElementById('storage-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+
+            const storage = {
+                token: localStorage.getItem('token'),
+                username: localStorage.getItem('username'),
+                user_id: localStorage.getItem('user_id'),
+                isAdmin: localStorage.getItem('isAdmin')
+            };
+
+            resultDiv.textContent = 'LocalStorage:\n\n' + JSON.stringify(storage, null, 2);
+        }
+
+        function clearLocalStorage() {
+            localStorage.clear();
+            const resultDiv = document.getElementById('storage-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result success';
+            resultDiv.textContent = '✅ LocalStorage vidé!';
+        }
+    </script>
+</body>
+</html>

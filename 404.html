@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page introuvable - SafeMates | Erreur 404</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-enhanced.css" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+      font-family: 'Inter', sans-serif;
+      color: #f1f5f9;
+    }
+
+    .error-container {
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 600px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .error-code {
+      font-size: 120px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 20px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .error-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #f1f5f9;
+    }
+
+    .error-message {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #22c55e;
+      border: 2px solid #22c55e;
+    }
+
+    .btn-outline:hover {
+      background: rgba(34, 197, 94, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .error-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .suggestions {
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .suggestions h3 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #f1f5f9;
+    }
+
+    .suggestions ul {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+      display: inline-block;
+    }
+
+    .suggestions li {
+      margin-bottom: 12px;
+    }
+
+    .suggestions a {
+      color: #22c55e;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .suggestions a:hover {
+      color: #10b981;
+      transform: translateX(4px);
+    }
+
+    .suggestions a::before {
+      content: "→";
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-icon">🎮</div>
+    <div class="error-code">404</div>
+    <h1 class="error-title">Oups ! Page introuvable</h1>
+    <p class="error-message">
+      La page que vous recherchez n'existe pas ou a été déplacée.
+      Mais ne vous inquiétez pas, nous allons vous aider à retrouver votre chemin !
+    </p>
+
+    <div class="error-actions">
+      <a href="/" class="btn btn-primary">
+        🏠 Retour à l'accueil
+      </a>
+      <a href="javascript:history.back()" class="btn btn-outline">
+        ← Page précédente
+      </a>
+    </div>
+
+    <div class="suggestions">
+      <h3>Pages populaires :</h3>
+      <ul>
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/signup.html">Créer un compte</a></li>
+        <li><a href="/login.html">Se connecter</a></li>
+        <li><a href="/contact.html">Nous contacter</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Log 404 pour analytics (optionnel)
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'page_view', {
+        page_title: '404 - Page Not Found',
+        page_location: window.location.href,
+        page_path: window.location.pathname
+      });
+    }
+  </script>
+</body>
+</html>

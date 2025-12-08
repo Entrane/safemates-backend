@@ -1,0 +1,5 @@
+jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            // Token invalide ou expirÃ©
+            securityLogger.logUnauthorizedAccess(ip, req.path, token);
+            return res.status(401).json({ error: 'unauthorized', message: 'Token invalide ou expirÃ©.' });
