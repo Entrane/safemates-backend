@@ -154,8 +154,21 @@ app.use(express.static(__dirname));
 // ====================================================
 // 1. BASE DE DONNÉES (SQLite) - AMÉLIORÉE POUR LA SYNCHRO CHAT
 // ====================================================
-const dbPath = process.env.DATABASE_PATH || './database.sqlite';
-const db = new sqlite3.Database(dbPath);
+// En production (Railway), utiliser le volume persistent
+// En développement, utiliser le dossier local
+const dbPath = process.env.NODE_ENV === 'production'
+    ? '/app/data/database.sqlite'
+    : (process.env.DATABASE_PATH || './database.sqlite');
+
+console.log('📁 Chemin de la base de données:', dbPath);
+
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error('❌ Erreur lors de l\'ouverture de la base de données:', err);
+    } else {
+        console.log('✅ Base de données ouverte avec succès:', dbPath);
+    }
+});
 const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
 
 db.serialize(() => {
