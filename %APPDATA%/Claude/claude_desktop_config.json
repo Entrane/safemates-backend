@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    },
+    "mysql": {
+      "command": "npx",
+      "args": ["-y", "@benborla29/mcp-server-mysql"],
+      "env": {
+        "MYSQL_HOST": "127.0.0.1",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "root",
+        "MYSQL_PASS": "En70frevaern@",
+        "MYSQL_DB": "u639530603_SafeMates"
+      }
+    }
+  }
+}
