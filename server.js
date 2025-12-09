@@ -152,28 +152,77 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
 // ====================================================
-// 1. BASE DE DONNÉES (SQLite) - AMÉLIORÉE POUR LA SYNCHRO CHAT
+// 1. BASE DE DONNÉES - MySQL ou SQLite selon USE_MYSQL
 // ====================================================
-// En production (Railway), utiliser le volume persistent
-// En développement, utiliser le dossier local
-const dbPath = process.env.NODE_ENV === 'production'
-    ? '/app/data/database.sqlite'
-    : (process.env.DATABASE_PATH || './database.sqlite');
+const useMysql = process.env.USE_MYSQL === 'true';
+let db;
 
-console.log('📁 Chemin de la base de données:', dbPath);
+if (useMysql) {
+    // Configuration MySQL pour production
+    console.log('🐬 Utilisation de MySQL (production)');
+    const mysql = require('mysql2');
+    const pool = mysql.createPool({
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USER,
+        password: process.env.MYSQL_PASSWORD,
+        database: process.env.MYSQL_DATABASE,
+        port: process.env.MYSQL_PORT || 3306,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
 
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('❌ Erreur lors de l\'ouverture de la base de données:', err);
-    } else {
-        console.log('✅ Base de données ouverte avec succès:', dbPath);
-    }
-});
+    // Tester la connexion
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('❌ Erreur connexion MySQL:', err);
+            process.exit(1);
+        }
+        console.log('✅ MySQL connectée avec succès:', process.env.MYSQL_HOST);
+        connection.release();
+    });
+
+    // Wrapper pour compatibilité avec le code SQLite existant
+    db = {
+        query: pool.query.bind(pool),
+        get: (sql, params, callback) => {
+            pool.query(sql, params, (err, results) => {
+                callback(err, results ? results[0] : null);
+            });
+        },
+        all: (sql, params, callback) => {
+            pool.query(sql, params, (err, results) => {
+                callback(err, results || []);
+            });
+        },
+        run: (sql, params, callback) => {
+            pool.query(sql, params, function(err, results) {
+                if (callback) callback.call({ lastID: results?.insertId, changes: results?.affectedRows }, err);
+            });
+        }
+    };
+} else {
+    // Configuration SQLite pour développement
+    console.log('📁 Utilisation de SQLite (développement)');
+    const dbPath = process.env.DATABASE_PATH || './database.sqlite';
+    console.log('📁 Chemin de la base de données:', dbPath);
+
+    db = new sqlite3.Database(dbPath, (err) => {
+        if (err) {
+            console.error('❌ Erreur lors de l\'ouverture de la base de données:', err);
+        } else {
+            console.log('✅ Base de données ouverte avec succès:', dbPath);
+        }
+    });
+}
+
 const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
 
-db.serialize(() => {
-    // 1. Utilisateurs
-    db.run(`
+// Créer les tables uniquement pour SQLite (MySQL les a déjà)
+if (!useMysql && db.serialize) {
+    db.serialize(() => {
+        // 1. Utilisateurs
+        db.run(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -442,7 +491,8 @@ db.serialize(() => {
             FOREIGN KEY (replied_by) REFERENCES users(id) ON DELETE SET NULL
         )
     `);
-});
+    });
+}
 
 // ====================================================
 // 2. MIDDLEWARE JWT D'AUTHENTIFICATION
