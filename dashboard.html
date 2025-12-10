@@ -1202,11 +1202,7 @@ const API_BASE_URL = window.location.hostname.includes('railway.app')
   ? `${window.location.protocol}//${window.location.hostname}`
   : '';
 
-const userPill = document.getElementById('connectedUsername');
-if (userPill) {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) userPill.textContent = storedUsername;
-}
+// Le nom d'utilisateur sera mis à jour par loadSocial() au chargement
 
 // Variables bibliothèque/jeux
 const libraryGrid = document.getElementById('libraryGrid');
@@ -1619,19 +1615,25 @@ window.toggleSidebar = function() {
 
 async function loadSocial() {
     try {
-        const fRes = await fetchProtected('/api/friends'); 
-        
+        const fRes = await fetchProtected('/api/friends');
+
         if (!fRes.ok) {
             throw new Error("Erreur de récupération des données sociales.");
         }
-        
+
         const fData = await fRes.json();
 
         localStorage.setItem('mm_friends_data', JSON.stringify(fData));
 
+        // Mise à jour du nom d'utilisateur dans la sidebar
+        const userPill = document.getElementById('connectedUsername');
         if (userPill) {
             const name = (fData.currentUser && fData.currentUser.username) || localStorage.getItem('username') || 'Utilisateur';
             userPill.textContent = name;
+            // Aussi mettre à jour le localStorage pour cohérence
+            if (fData.currentUser && fData.currentUser.username) {
+                localStorage.setItem('username', fData.currentUser.username);
+            }
         }
 
         renderFriends(fData.friends || []);
