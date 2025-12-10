@@ -17,6 +17,9 @@ const cors = require('cors');
 const hpp = require('hpp');
 const compression = require('compression');
 
+// Import du module de base de données unifié (SQLite/MySQL)
+const database = require('./database');
+
 // Imports des modules de sécurité
 const { logger, securityLogger, requestLogger, detectSuspiciousActivity } = require('./logger');
 const {
@@ -152,24 +155,33 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
 // ====================================================
-// 1. BASE DE DONNÉES (SQLite) - AMÉLIORÉE POUR LA SYNCHRO CHAT
+// 1. BASE DE DONNÉES - Support SQLite (dev) et MySQL (production)
 // ====================================================
-// En production (Railway), utiliser le volume persistent
-// En développement, utiliser le dossier local
-const dbPath = process.env.NODE_ENV === 'production'
-    ? '/app/data/database.sqlite'
-    : (process.env.DATABASE_PATH || './database.sqlite');
-
-console.log('📁 Chemin de la base de données:', dbPath);
-
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('❌ Erreur lors de l\'ouverture de la base de données:', err);
-    } else {
-        console.log('✅ Base de données ouverte avec succès:', dbPath);
-    }
-});
 const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
+
+// Variable pour stocker la connexion (pour rétrocompatibilité avec le code existant)
+let db;
+
+// Initialisation asynchrone de la base de données
+(async function initDB() {
+    try {
+        await database.initDatabase();
+        db = database.getDb();
+        console.log('✅ Base de données initialisée:', database.isMySQL() ? 'MySQL (production)' : 'SQLite (développement)');
+
+        // Si SQLite, appliquer les migrations ci-dessous
+        if (!database.isMySQL()) {
+            await applySQLiteMigrations();
+        }
+    } catch (error) {
+        console.error('❌ Erreur fatale lors de l\'initialisation de la base de données:', error);
+        process.exit(1);
+    }
+})();
+
+// Fonction pour appliquer les migrations SQLite (anciennes)
+async function applySQLiteMigrations() {
+    return new Promise((resolve) => {
 
 db.serialize(() => {
     // 1. Utilisateurs
@@ -442,7 +454,9 @@ db.serialize(() => {
             FOREIGN KEY (replied_by) REFERENCES users(id) ON DELETE SET NULL
         )
     `);
-});
+        resolve();
+    });
+}
 
 // ====================================================
 // 2. MIDDLEWARE JWT D'AUTHENTIFICATION
