@@ -373,7 +373,9 @@ if (form) {
         }
 
         // Configuration de l'API - Détection automatique de l'environnement
-        const API_BASE_URL = window.location.hostname.includes('railway.app')
+        const API_BASE_URL = window.location.hostname === 'safemates.fr' || window.location.hostname === 'www.safemates.fr'
+          ? 'https://web-production-bdcd3.up.railway.app'
+          : window.location.hostname.includes('railway.app')
           ? `${window.location.protocol}//${window.location.hostname}`
           : '';
 
