@@ -454,6 +454,7 @@ db.serialize(() => {
             FOREIGN KEY (replied_by) REFERENCES users(id) ON DELETE SET NULL
         )
     `);
+    });
         resolve();
     });
 }
