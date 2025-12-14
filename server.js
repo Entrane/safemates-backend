@@ -17,8 +17,8 @@ const cors = require('cors');
 const hpp = require('hpp');
 const compression = require('compression');
 
-// Import du module de base de données unifié (SQLite/MySQL)
-const database = require('./database');
+// Import du wrapper de base de données (SQLite/MySQL)
+const dbWrapper = require('./db-wrapper');
 
 // Imports des modules de sécurité
 const { logger, securityLogger, requestLogger, detectSuspiciousActivity } = require('./logger');
@@ -159,27 +159,39 @@ app.use(express.static(__dirname));
 // ====================================================
 const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
 
-// Variable pour stocker la connexion (pour rétrocompatibilité avec le code existant)
-let db;
+// Utiliser le wrapper db
+const db = dbWrapper.db;
 
 // Initialisation asynchrone de la base de données
 (async function initDB() {
     try {
-        await database.initDatabase();
-        db = database.getDb();
-        console.log('✅ Base de données initialisée:', database.isMySQL() ? 'MySQL (production)' : 'SQLite (développement)');
+        await dbWrapper.initializeDatabase();
+        console.log('✅ Base de données initialisée:', dbWrapper.isMySQL() ? 'MySQL (production)' : 'SQLite (développement)');
 
-        // Si SQLite, appliquer les migrations ci-dessous
-        if (!database.isMySQL()) {
-            await applySQLiteMigrations();
-        }
+        // Créer les tables
+        await createTables();
     } catch (error) {
         console.error('❌ Erreur fatale lors de l\'initialisation de la base de données:', error);
         process.exit(1);
     }
 })();
 
-// Fonction pour appliquer les migrations SQLite (anciennes)
+// Fonction pour créer les tables
+async function createTables() {
+    const isMySQL = dbWrapper.isMySQL();
+
+    if (isMySQL) {
+        console.log('📦 Création des tables MySQL...');
+        // Les tables MySQL sont déjà créées dans database.js
+        // On peut aussi les créer ici si nécessaire
+        console.log('✅ Tables MySQL prêtes');
+    } else {
+        console.log('📦 Création des tables SQLite...');
+        await applySQLiteMigrations();
+    }
+}
+
+// Fonction pour appliquer les migrations SQLite
 async function applySQLiteMigrations() {
     return new Promise((resolve) => {
 
