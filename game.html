@@ -1253,8 +1253,62 @@
         const userPill = document.getElementById('connectedUsername');
         if (userPill) {
             const storedUsername = localStorage.getItem('username');
-            if (storedUsername) {
+            console.log('📝 Username stocké:', storedUsername);
+            console.log('📝 LocalStorage complet:', {
+                username: localStorage.getItem('username'),
+                user_id: localStorage.getItem('user_id'),
+                token: localStorage.getItem('token') ? 'présent' : 'absent'
+            });
+
+            if (storedUsername && storedUsername !== 'undefined' && storedUsername !== 'null') {
                 userPill.textContent = storedUsername;
+            } else {
+                // Si pas de username, vérifier si l'utilisateur est connecté
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    // Pas connecté, rediriger vers login
+                    console.warn('⚠️ Pas de token, redirection vers login');
+                    window.location.href = '/login.html';
+                } else {
+                    // Connecté mais pas de username, essayer de le récupérer
+                    userPill.textContent = 'Chargement...';
+                    fetchGameUserProfile();
+                }
+            }
+        }
+
+        // Fonction pour récupérer le profil utilisateur
+        async function fetchGameUserProfile() {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('user_id');
+
+            if (!token || !userId) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const profile = await response.json();
+                    if (profile.username) {
+                        localStorage.setItem('username', profile.username);
+                        const userPill = document.getElementById('connectedUsername');
+                        if (userPill) {
+                            userPill.textContent = profile.username;
+                        }
+                    }
+                } else {
+                    // Token invalide, rediriger vers login
+                    console.warn('⚠️ Token invalide, redirection vers login');
+                    localStorage.clear();
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('❌ Erreur récupération profil:', error);
             }
         }
 
