@@ -1198,71 +1198,13 @@ const activeChats = {};
 const friendsSidebar = document.getElementById('friendsSidebar');
 const chatContainer = document.getElementById('chat-container');
 // Configuration de l'API - Détection automatique de l'environnement
-const API_BASE_URL = window.location.hostname.includes('railway.app')
+const API_BASE_URL = window.location.hostname === 'safemates.fr' || window.location.hostname === 'www.safemates.fr'
+  ? 'https://web-production-bdcd3.up.railway.app'
+  : window.location.hostname.includes('railway.app')
   ? `${window.location.protocol}//${window.location.hostname}`
   : '';
 
-const userPill = document.getElementById('connectedUsername');
-if (userPill) {
-    const storedUsername = localStorage.getItem('username');
-    console.log('📝 Username stocké:', storedUsername);
-    console.log('📝 LocalStorage complet:', {
-        username: localStorage.getItem('username'),
-        user_id: localStorage.getItem('user_id'),
-        token: localStorage.getItem('token') ? 'présent' : 'absent'
-    });
-
-    if (storedUsername && storedUsername !== 'undefined' && storedUsername !== 'null') {
-        userPill.textContent = storedUsername;
-    } else {
-        // Si pas de username, vérifier si l'utilisateur est connecté
-        const token = localStorage.getItem('token');
-        if (!token) {
-            // Pas connecté, rediriger vers login
-            console.warn('⚠️ Pas de token, redirection vers login');
-            window.location.href = '/login.html';
-        } else {
-            // Connecté mais pas de username, essayer de le récupérer
-            userPill.textContent = 'Chargement...';
-            fetchUserProfile();
-        }
-    }
-}
-
-// Fonction pour récupérer le profil utilisateur
-async function fetchUserProfile() {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('user_id');
-
-    if (!token || !userId) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const profile = await response.json();
-            if (profile.username) {
-                localStorage.setItem('username', profile.username);
-                const userPill = document.getElementById('connectedUsername');
-                if (userPill) {
-                    userPill.textContent = profile.username;
-                }
-            }
-        } else {
-            // Token invalide, rediriger vers login
-            console.warn('⚠️ Token invalide, redirection vers login');
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-    } catch (error) {
-        console.error('❌ Erreur récupération profil:', error);
-    }
-}
+// Le nom d'utilisateur sera mis à jour par loadSocial() au chargement
 
 // Variables bibliothèque/jeux
 const libraryGrid = document.getElementById('libraryGrid');
@@ -1675,19 +1617,25 @@ window.toggleSidebar = function() {
 
 async function loadSocial() {
     try {
-        const fRes = await fetchProtected('/api/friends'); 
-        
+        const fRes = await fetchProtected('/api/friends');
+
         if (!fRes.ok) {
             throw new Error("Erreur de récupération des données sociales.");
         }
-        
+
         const fData = await fRes.json();
 
         localStorage.setItem('mm_friends_data', JSON.stringify(fData));
 
+        // Mise à jour du nom d'utilisateur dans la sidebar
+        const userPill = document.getElementById('connectedUsername');
         if (userPill) {
             const name = (fData.currentUser && fData.currentUser.username) || localStorage.getItem('username') || 'Utilisateur';
             userPill.textContent = name;
+            // Aussi mettre à jour le localStorage pour cohérence
+            if (fData.currentUser && fData.currentUser.username) {
+                localStorage.setItem('username', fData.currentUser.username);
+            }
         }
 
         renderFriends(fData.friends || []);
