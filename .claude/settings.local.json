@@ -47,7 +47,11 @@
       "Bash(curl:*)",
       "Bash(notepad .env)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(gcc:*)",
+      "Bash(where:*)",
+      "Bash(git log:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []
