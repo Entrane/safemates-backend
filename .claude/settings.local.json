@@ -52,7 +52,10 @@
       "Bash(where:*)",
       "Bash(git log:*)",
       "Bash(echo:*)",
-      "Bash(.auto-deploy.bat)"
+      "Bash(.auto-deploy.bat)",
+      "Bash(ftp-upload.bat)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -Command \"cd ''C:\\\\Users\\\\enzoj\\\\Desktop\\\\MatchMates1.0-main''; .\\\\ftp-upload.ps1\")",
+      "Bash(cmd.exe /c \"cd C:\\\\Users\\\\enzoj\\\\Desktop\\\\MatchMates1.0-main && upload-ftp-simple.bat\")"
     ],
     "deny": [],
     "ask": []
