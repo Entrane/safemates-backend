@@ -23,8 +23,8 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
-  <link rel="stylesheet" href="/style.css?v=1768163584348" />
-  <link rel="stylesheet" href="/ads.css?v=1768163584348" />
+  <link rel="stylesheet" href="/style.css?v=1768165762094" />
+  <link rel="stylesheet" href="/ads.css?v=1768165762094" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" /></noscript>
 
@@ -1074,7 +1074,7 @@
     </aside>
     
     <div id="chat-container" class="chat-container"></div>
-<script src="/chatmanager.js?v=1768163584348"></script>
+<script src="/chatmanager.js?v=1768165762094"></script>
 <script>
         // ====================================================
         // --- 0. DéCLARATION DES VARIABLES GLOBALES ---
@@ -1240,12 +1240,8 @@
         let activeUsername = null;
         let activeUserId = null;
 
-        // Configuration de l'API - Détection automatique de l'environnement
-        const API_BASE_URL = window.location.hostname === 'safemates.fr' || window.location.hostname === 'www.safemates.fr'
-          ? 'https://web-production-bdcd3.up.railway.app'
-          : window.location.hostname.includes('railway.app')
-          ? `${window.location.protocol}//${window.location.hostname}`
-          : '';
+        // Configuration de l'API - Utiliser l'API PHP locale sur Hostinger
+        const API_BASE_URL = '';
 
         // Variables sociales/chat
         const activeChats = {};
@@ -2567,7 +2563,7 @@ window.sendMessage = async (e, username) => {
     </script>
 
     <!-- Systéme de signalement d'utilisateur -->
-    <script src="/report-user.js?v=1768163584348"></script>
+    <script src="/report-user.js?v=1768165762094"></script>
 </body>
 </html>
 
