@@ -1,0 +1,33 @@
+# Configuration Apache pour les routes API
+
+RewriteEngine On
+
+# Activer le module rewrite
+Options +FollowSymLinks
+
+# Route /api/me
+RewriteRule ^me$ me.php [L]
+
+# Route /api/user/profile
+RewriteRule ^user/profile$ user/profile.php [L]
+
+# Route /api/friends (GET)
+RewriteRule ^friends$ friends.php [L]
+
+# Route /api/friends/send
+RewriteRule ^friends/send$ friends/send.php [L]
+
+# Route /api/friends/respond
+RewriteRule ^friends/respond$ friends/respond.php [L]
+
+# Route /api/friends/remove
+RewriteRule ^friends/remove$ friends/remove.php [L]
+
+# Route /api/notifications
+RewriteRule ^notifications$ notifications.php [L]
+
+# Route /api/notifications/{id}/read
+RewriteRule ^notifications/([0-9]+)/read$ notifications/read.php [L]
+
+# Route /api/notifications/read-all
+RewriteRule ^notifications/read-all$ notifications/read-all.php [L]
