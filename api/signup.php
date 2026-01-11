@@ -61,6 +61,13 @@ try {
 
     $userId = $db->lastInsertId();
 
+    // Démarrer la session PHP
+    session_start();
+    $_SESSION['user_id'] = $userId;
+    $_SESSION['username'] = $username;
+    $_SESSION['email'] = $email;
+    $_SESSION['is_admin'] = false;
+
     // Générer un token JWT
     $token = generateToken($userId, $username);
 

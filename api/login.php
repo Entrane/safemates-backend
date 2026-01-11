@@ -53,6 +53,13 @@ try {
         sendJSON(['error' => 'Identifiants incorrects'], 401);
     }
 
+    // Démarrer la session PHP
+    session_start();
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['is_admin'] = $user['is_admin'] == 1;
+
     // Générer un token JWT
     $token = generateToken($user['id'], $user['username']);
 
