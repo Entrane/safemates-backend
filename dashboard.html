@@ -1083,7 +1083,6 @@
   <nav class="side-nav" id="sideNav">
     <div class="nav-title">SafeMates</div>
     <a class="nav-link" href="/dashboard"><i class="fas fa-home"></i><span>Accueil</span></a>
-    <a class="nav-link" href="/index.html"><i class="fas fa-lightbulb"></i><span>Concept</span></a>
     <a class="nav-link" href="/contact.html"><i class="fas fa-envelope"></i><span>Contact</span></a>
     <a class="nav-link logout-link" href="#"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
 
@@ -1373,16 +1372,32 @@ function startNotificationPolling() {
 // ====================================================
 // --- AFFICHAGE DU NOM D'UTILISATEUR DANS LE HEADER ---
 // ====================================================
-function updateUserProfileDisplay() {
-    const username = localStorage.getItem('username');
-    
-    if (username) {
+async function updateUserProfileDisplay() {
+    let username = localStorage.getItem('username');
+
+    // Si le username n'est pas dans localStorage, le récupérer depuis l'API
+    if (!username || username === 'undefined' || username === 'null') {
+        try {
+            const response = await fetchProtected('/api/user/profile');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.username) {
+                    username = data.username;
+                    localStorage.setItem('username', username);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur lors de la récupération du profil:', error);
+        }
+    }
+
+    if (username && username !== 'undefined' && username !== 'null') {
         const userAvatar = document.getElementById('userAvatar');
         if (userAvatar) {
             userAvatar.textContent = username.charAt(0).toUpperCase();
             userAvatar.title = `Profil de ${username}`;
         }
-        
+
         const userNameDisplay = document.getElementById('userNameDisplay');
         if (userNameDisplay) {
             userNameDisplay.textContent = username;
@@ -1391,6 +1406,11 @@ function updateUserProfileDisplay() {
         const userAvatar = document.getElementById('userAvatar');
         if (userAvatar) {
             userAvatar.textContent = 'U';
+        }
+
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        if (userNameDisplay) {
+            userNameDisplay.textContent = '';
         }
     }
 }
