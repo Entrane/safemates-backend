@@ -55,7 +55,12 @@
       "Bash(.auto-deploy.bat)",
       "Bash(ftp-upload.bat)",
       "Bash(powershell.exe -ExecutionPolicy Bypass -Command \"cd ''C:\\\\Users\\\\enzoj\\\\Desktop\\\\MatchMates1.0-main''; .\\\\ftp-upload.ps1\")",
-      "Bash(cmd.exe /c \"cd C:\\\\Users\\\\enzoj\\\\Desktop\\\\MatchMates1.0-main && upload-ftp-simple.bat\")"
+      "Bash(cmd.exe /c \"cd C:\\\\Users\\\\enzoj\\\\Desktop\\\\MatchMates1.0-main && upload-ftp-simple.bat\")",
+      "Bash(for file in api/me.php api/friends.php api/notifications.php \"api/.htaccess\")",
+      "Bash(do echo \"Uploading $file...\")",
+      "Bash(done)",
+      "Bash(for file in \"api/user/profile.php\" \"api/friends/send.php\" \"api/friends/respond.php\" \"api/friends/remove.php\" \"api/notifications/read.php\" \"api/notifications/read-all.php\")",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
