@@ -51,7 +51,8 @@
       "Bash(gcc:*)",
       "Bash(where:*)",
       "Bash(git log:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(.auto-deploy.bat)"
     ],
     "deny": [],
     "ask": []

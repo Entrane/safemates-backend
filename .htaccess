@@ -1,6 +1,6 @@
 # ================================================
-# Configuration .htaccess pour MatchMates PHP
-# Version pour hébergement Hostinger classique
+# Configuration .htaccess pour MatchMates
+# Version optimisée avec cache busting
 # ================================================
 
 # ================================================
@@ -28,10 +28,40 @@ Options -Indexes
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
 
-    # CORS pour les API PHP
+    # CORS pour les API
     Header set Access-Control-Allow-Origin "*"
     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# ================================================
+# GESTION DU CACHE - OPTIMISÉ
+# ================================================
+
+<IfModule mod_headers.c>
+    # HTML - PAS de cache (toujours recharger)
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+
+    # CSS et JS avec versioning - Cache 1 an (le ?v=timestamp force le rechargement)
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Images - Cache 1 an
+    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|svg|woff|woff2|ttf|otf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # API - PAS de cache
+    <FilesMatch "\.php$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
 </IfModule>
 
 # ================================================
@@ -46,12 +76,11 @@ Options -Indexes
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Rediriger www vers non-www (ou inversement)
+    # Rediriger www vers non-www
     RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
     RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
     # Réécriture des URLs d'API
-    # /signup => /api/signup.php
     RewriteRule ^signup$ /api/signup.php [L]
     RewriteRule ^login$ /api/login.php [L]
 
@@ -70,14 +99,10 @@ Options -Indexes
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^api/([a-zA-Z0-9_-]+)$ /api/$1.php [L]
 
-    # /dashboard => /dashboard.html
+    # Routes HTML
     RewriteRule ^dashboard$ /dashboard.html [L]
     RewriteRule ^moderation$ /moderation.html [L]
-
-    # /game/* => /game.html (pour tous les jeux)
     RewriteRule ^game/(.*)$ /game.html [L]
-
-    # Rediriger /register vers /signup.html
     RewriteRule ^register$ /signup.html [R=301,L]
 </IfModule>
 
@@ -86,7 +111,6 @@ Options -Indexes
 # ================================================
 
 <IfModule mod_deflate.c>
-    # Compresser HTML, CSS, JavaScript, Text, XML et fontes
     AddOutputFilterByType DEFLATE application/javascript
     AddOutputFilterByType DEFLATE application/json
     AddOutputFilterByType DEFLATE application/rss+xml
@@ -118,7 +142,15 @@ Options -Indexes
 <IfModule mod_expires.c>
     ExpiresActive On
 
-    # Images
+    # HTML - Pas de cache
+    ExpiresByType text/html "access plus 0 seconds"
+
+    # CSS et JS avec versioning - 1 an
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+
+    # Images - 1 an
     ExpiresByType image/jpg "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
@@ -127,46 +159,12 @@ Options -Indexes
     ExpiresByType image/svg+xml "access plus 1 year"
     ExpiresByType image/x-icon "access plus 1 year"
 
-    # CSS et JavaScript
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType text/javascript "access plus 1 month"
-
-    # Fonts
+    # Fonts - 1 an
     ExpiresByType font/ttf "access plus 1 year"
     ExpiresByType font/otf "access plus 1 year"
     ExpiresByType font/woff "access plus 1 year"
     ExpiresByType font/woff2 "access plus 1 year"
     ExpiresByType application/font-woff "access plus 1 year"
-
-    # HTML
-    ExpiresByType text/html "access plus 1 hour"
-
-    # Par défaut
-    ExpiresDefault "access plus 2 days"
-</IfModule>
-
-# ================================================
-# EN-TÊTES DE CACHE
-# ================================================
-
-<IfModule mod_headers.c>
-    # Cache pour 1 an pour les ressources statiques
-    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|svg|js|css|swf|woff|woff2|ttf|otf)$">
-        Header set Cache-Control "max-age=31536000, public"
-    </FilesMatch>
-
-    # Cache pour 1 jour pour HTML
-    <FilesMatch "\.(html|htm)$">
-        Header set Cache-Control "max-age=86400, public, must-revalidate"
-    </FilesMatch>
-
-    # Désactiver le cache pour les API PHP
-    <FilesMatch "\.php$">
-        Header set Cache-Control "no-cache, no-store, must-revalidate"
-        Header set Pragma "no-cache"
-        Header set Expires 0
-    </FilesMatch>
 </IfModule>
 
 # ================================================
@@ -181,14 +179,9 @@ ErrorDocument 500 /500.html
 # ================================================
 
 <IfModule mod_php.c>
-    # Augmenter la limite de mémoire si nécessaire
     php_value memory_limit 128M
-
-    # Augmenter la taille maximale des uploads
     php_value upload_max_filesize 10M
     php_value post_max_size 10M
-
-    # Désactiver l'affichage des erreurs en production
     php_flag display_errors Off
     php_flag log_errors On
 </IfModule>
