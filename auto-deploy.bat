@@ -32,8 +32,19 @@ git push origin main
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo ========================================
-    echo   DEPLOIEMENT REUSSI !
-    echo   Hostinger deploiera dans 30-60 sec
+    echo   PUSH GITHUB REUSSI !
+    echo   Deploiement sur Hostinger en cours...
+    echo ========================================
+    echo.
+
+    REM Appeler le script de déploiement Hostinger
+    echo [DEPLOY] Declenchement du deploiement sur Hostinger...
+    curl -s "https://safemates.fr/deploy-simple.php?password=SafeMates2024Deploy"
+
+    echo.
+    echo ========================================
+    echo   DEPLOIEMENT COMPLET !
+    echo   Ton site est a jour sur Hostinger
     echo ========================================
 ) else (
     echo.
@@ -42,4 +53,4 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 echo.
-timeout /t 2 >nul
+timeout /t 3 >nul
