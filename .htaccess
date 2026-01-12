@@ -84,7 +84,18 @@ Options -Indexes
     RewriteRule ^signup$ /api/signup.php [L]
     RewriteRule ^login$ /api/login.php [L]
 
-    # /api/match/search/{game} => /api/match/search.php
+    # Nouvelles routes API selon spécification
+    # /api/profile/{gameSlug} => /api/profile.php?game={gameSlug}
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/profile/([a-z0-9-]+)$ /api/profile.php?game=$1 [QSA,L]
+
+    # /api/matchmaking/{gameSlug} => /api/match/search.php?game={gameSlug}
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/matchmaking/([a-z0-9-]+)$ /api/match/search.php?game=$1 [QSA,L]
+
+    # Route legacy: /api/match/search/{game} => /api/match/search.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^api/match/search/([a-zA-Z0-9_-]+)$ /api/match/search.php [L]
