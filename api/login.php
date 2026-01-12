@@ -60,6 +60,14 @@ try {
     $_SESSION['email'] = $user['email'];
     $_SESSION['is_admin'] = $user['is_admin'] == 1;
 
+    // Créer ou mettre à jour l'entrée dans user_sessions
+    $stmt = $db->prepare('
+        INSERT INTO user_sessions (user_id, last_activity)
+        VALUES (?, NOW())
+        ON DUPLICATE KEY UPDATE last_activity = NOW()
+    ');
+    $stmt->execute([$user['id']]);
+
     // Générer un token JWT
     $token = generateToken($user['id'], $user['username']);
 

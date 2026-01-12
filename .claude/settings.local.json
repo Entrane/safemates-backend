@@ -60,7 +60,10 @@
       "Bash(do echo \"Uploading $file...\")",
       "Bash(done)",
       "Bash(for file in \"api/user/profile.php\" \"api/friends/send.php\" \"api/friends/respond.php\" \"api/friends/remove.php\" \"api/notifications/read.php\" \"api/notifications/read-all.php\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(for file in \"api/user/profile.php\" \"api/friends.php\" \"api/notifications.php\" \"api/friends/send.php\" \"api/friends/respond.php\" \"api/friends/remove.php\" \"api/notifications/read.php\" \"api/notifications/read-all.php\")",
+      "Bash(do curl -T \"$file\" -u \"u639530603:1b^6kf$#g=I7pzZU\" \"ftp://92.113.28.141/domains/safemates.fr/public_html/$file\" --ftp-create-dirs)",
+      "Bash(./deploy-api.bat)"
     ],
     "deny": [],
     "ask": []

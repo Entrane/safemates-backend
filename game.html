@@ -2533,6 +2533,26 @@ window.sendMessage = async (e, username) => {
         });
     });
 
+    // Démarrer le heartbeat pour maintenir l'utilisateur en ligne
+    (function startHeartbeat() {
+        async function sendHeartbeat() {
+            try {
+                const response = await fetchProtected('/api/heartbeat.php', {
+                    method: 'POST'
+                });
+                if (!response.ok) {
+                    console.warn('Heartbeat failed:', response.status);
+                }
+            } catch (error) {
+                console.error('Erreur heartbeat:', error);
+            }
+        }
+        // Envoyer immédiatement
+        sendHeartbeat();
+        // Puis toutes les 5 minutes (300000ms)
+        setInterval(sendHeartbeat, 300000);
+    })();
+
     // Confirmation du chargement des fonctions
     console.log('? Initialisation terminée');
     console.log('Fonctions disponibles:');

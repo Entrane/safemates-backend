@@ -103,6 +103,7 @@ try {
     $placeholders = implode(',', array_fill(0, count($acceptableRanks), '?'));
 
     // Rechercher des profils qui correspondent à MES critères uniquement
+    // ET qui sont actuellement en ligne (actifs dans les 15 dernières minutes)
     $stmt = $db->prepare("
         SELECT
             gp.id as profile_id,
@@ -113,13 +114,16 @@ try {
             gp.style,
             gp.options,
             u.username,
-            u.email
+            u.email,
+            us.last_activity
         FROM game_profiles gp
         JOIN users u ON gp.user_id = u.id
+        JOIN user_sessions us ON u.id = us.user_id
         WHERE gp.game = ?
         AND gp.user_id != ?
         AND gp.rank IN ($placeholders)
         AND u.is_banned = 0
+        AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
         ORDER BY RAND()
         LIMIT 10
     ");

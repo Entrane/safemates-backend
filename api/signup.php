@@ -68,6 +68,13 @@ try {
     $_SESSION['email'] = $email;
     $_SESSION['is_admin'] = false;
 
+    // Créer une entrée dans user_sessions
+    $stmt = $db->prepare('
+        INSERT INTO user_sessions (user_id, last_activity)
+        VALUES (?, NOW())
+    ');
+    $stmt->execute([$userId]);
+
     // Générer un token JWT
     $token = generateToken($userId, $username);
 

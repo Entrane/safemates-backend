@@ -1367,6 +1367,30 @@ function startNotificationPolling() {
 }
 
 // ====================================================
+// --- HEARTBEAT POUR MAINTENIR L'ACTIVITÉ EN LIGNE ---
+// ====================================================
+async function sendHeartbeat() {
+    try {
+        const response = await fetchProtected('/api/heartbeat.php', {
+            method: 'POST'
+        });
+        if (!response.ok) {
+            console.warn('Heartbeat failed:', response.status);
+        }
+    } catch (error) {
+        console.error('Erreur heartbeat:', error);
+    }
+}
+
+// Démarrer l'envoi régulier du heartbeat
+function startHeartbeat() {
+    // Envoyer immédiatement
+    sendHeartbeat();
+    // Puis toutes les 5 minutes (300000ms)
+    setInterval(sendHeartbeat, 300000);
+}
+
+// ====================================================
 // --- AFFICHAGE DU NOM D'UTILISATEUR DANS LE HEADER ---
 // ====================================================
 async function updateUserProfileDisplay() {
@@ -2209,6 +2233,7 @@ INITIALISATION FINALE
     startSocialSync();
     updateUserProfileDisplay();
     startNotificationPolling();
+    startHeartbeat();
 })();
 </script>
 
