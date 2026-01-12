@@ -70,7 +70,8 @@ try {
     // Log de débogage
     error_log("MATCHMAKING - User: {$currentUserId}, Game: {$game}, Rank Level: {$userRankLevel}, Mode: {$userMode}, Style: {$userStyle}, Tolerance: {$userTolerance}");
 
-    // Recherche SQL avec critères assouplis (style optionnel si vide)
+    // Recherche SQL - Matching uniquement sur rank_level (avec tolérance)
+    // Mode et style sont affichés mais ne filtrent pas
     $sql = "
         SELECT
             u.id as user_id,
@@ -83,28 +84,20 @@ try {
         JOIN users u ON u.id = gp.user_id
         JOIN user_sessions us ON u.id = us.user_id
         WHERE gp.game = :game
-          AND gp.mode = :user_mode
           AND ABS(gp.rank_level - :user_rank_level) <= :user_tolerance
           AND gp.user_id != :current_user_id
           AND u.is_banned = 0
           AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+        ORDER BY RAND()
+        LIMIT 10
     ";
 
-    // Ajouter le filtre style seulement si l'utilisateur en a défini un
     $params = [
         'game' => $game,
-        'user_mode' => $userMode,
         'user_rank_level' => $userRankLevel,
         'user_tolerance' => $userTolerance,
         'current_user_id' => $currentUserId
     ];
-
-    if (!empty($userStyle)) {
-        $sql .= " AND gp.style = :user_style";
-        $params['user_style'] = $userStyle;
-    }
-
-    $sql .= " ORDER BY RAND() LIMIT 10";
 
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
