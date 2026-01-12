@@ -4,9 +4,9 @@
  * GET /api/match/search/{game}
  */
 
-require_once '../config.php';
+require_once __DIR__ . '/../config.php';
 
-// Vérifier l'authentification
+// Vérifier l'authentification (session OU token JWT)
 $user = requireAuth();
 
 // Récupérer le jeu depuis l'URL ou les paramètres GET

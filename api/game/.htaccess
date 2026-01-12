@@ -1,0 +1,9 @@
+# Configuration Apache pour les routes API game
+
+RewriteEngine On
+
+# Route /api/game/settings
+RewriteRule ^settings$ settings.php [L]
+
+# Route /api/game/preferences
+RewriteRule ^preferences$ preferences.php [L]
