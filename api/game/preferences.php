@@ -4,14 +4,14 @@
  * POST /api/game/preferences.php
  */
 
-require_once '../config.php';
+require_once __DIR__ . '/../config.php';
 
 // Vérifier que c'est bien une requête POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendJSON(['error' => 'Méthode non autorisée'], 405);
 }
 
-// Vérifier l'authentification
+// Vérifier l'authentification (session OU token JWT)
 $user = requireAuth();
 
 // Récupérer les données JSON
