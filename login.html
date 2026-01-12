@@ -142,12 +142,8 @@
   <script src="animations.js?v=1768165762094"></script>
   <script>
 // Gestion du formulaire de connexion
-// Configuration de l'API - Détection automatique de l'environnement
-const API_BASE_URL = window.location.hostname === 'safemates.fr' || window.location.hostname === 'www.safemates.fr'
-  ? 'https://web-production-bdcd3.up.railway.app'
-  : window.location.hostname.includes('railway.app')
-  ? `${window.location.protocol}//${window.location.hostname}`
-  : '';
+// Configuration de l'API - Utiliser l'API PHP locale sur Hostinger
+const API_BASE_URL = '';
 
 document.querySelector('.login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -159,7 +155,7 @@ document.querySelector('.login-form').addEventListener('submit', async function(
   };
 
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/login.php`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -171,13 +167,13 @@ document.querySelector('.login-form').addEventListener('submit', async function(
     const result = await response.json();
 
     if (response.ok) {
-      // Stocker le token et rediriger
+      // Stocker le token et les infos utilisateur
       localStorage.setItem('token', result.token);
-      localStorage.setItem('username', result.username);
-      localStorage.setItem('user_id', result.user_id);
+      localStorage.setItem('username', result.user.username);
+      localStorage.setItem('user_id', result.user.id);
 
-      // Vérifier si l'utilisateur est admin (si cette info est disponible)
-      if (result.isAdmin) {
+      // Vérifier si l'utilisateur est admin
+      if (result.user.isAdmin) {
         localStorage.setItem('isAdmin', 'true');
       }
 
