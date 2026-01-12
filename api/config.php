@@ -141,8 +141,21 @@ function getAuthToken() {
     return null;
 }
 
-// Fonction pour vérifier l'authentification
+// Fonction pour vérifier l'authentification (session OU token JWT)
 function requireAuth() {
+    session_start();
+
+    // Priorité 1: Session PHP
+    if (isset($_SESSION['user_id'])) {
+        return [
+            'userId' => $_SESSION['user_id'],
+            'username' => $_SESSION['username'] ?? null,
+            'email' => $_SESSION['email'] ?? null,
+            'isAdmin' => $_SESSION['is_admin'] ?? false
+        ];
+    }
+
+    // Priorité 2: Token JWT
     $token = getAuthToken();
     $user = verifyToken($token);
 
@@ -151,6 +164,26 @@ function requireAuth() {
     }
 
     return $user;
+}
+
+// Fonction pour obtenir l'ID utilisateur depuis session ou token
+function getUserId() {
+    session_start();
+
+    // Priorité 1: Session PHP
+    if (isset($_SESSION['user_id'])) {
+        return $_SESSION['user_id'];
+    }
+
+    // Priorité 2: Token JWT
+    $token = getAuthToken();
+    $tokenData = verifyToken($token);
+
+    if ($tokenData && isset($tokenData['userId'])) {
+        return $tokenData['userId'];
+    }
+
+    return null;
 }
 
 // Fonction pour hasher un mot de passe

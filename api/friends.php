@@ -6,15 +6,9 @@
 
 require_once __DIR__ . '/config.php';
 
-// Démarrer la session
-session_start();
-
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    sendJSON(['error' => 'Non authentifié'], 401);
-}
-
-$userId = $_SESSION['user_id'];
+// Vérifier l'authentification (session OU token JWT)
+$authUser = requireAuth();
+$userId = $authUser['userId'];
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {

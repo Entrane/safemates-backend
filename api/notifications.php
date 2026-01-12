@@ -6,11 +6,8 @@
 
 require_once __DIR__ . '/config.php';
 
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    sendJSON(['error' => 'Non authentifié'], 401);
-}
+$authUser = requireAuth();
+$userId = $authUser['userId'];
 
 try {
     $db = getDB();
@@ -29,7 +26,7 @@ try {
         ORDER BY created_at DESC
         LIMIT 50
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$userId]);
     $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Décoder les champs JSON

@@ -6,9 +6,11 @@
 
 require_once __DIR__ . '/../config.php';
 
-session_start();
 
-if (!isset($_SESSION['user_id'])) {
+
+$authUser = requireAuth();
+$userId = $authUser['userId'];
+if (false) {
     sendJSON(['error' => 'Non authentifié'], 401);
 }
 

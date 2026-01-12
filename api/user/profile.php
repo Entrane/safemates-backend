@@ -6,13 +6,9 @@
 
 require_once __DIR__ . '/../config.php';
 
-// Démarrer la session
-session_start();
-
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    sendJSON(['error' => 'Non authentifié'], 401);
-}
+// Vérifier l'authentification (session OU token JWT)
+$authUser = requireAuth();
+$userId = $authUser['userId'];
 
 try {
     $db = getDB();
@@ -34,7 +30,7 @@ try {
         LEFT JOIN user_profiles up ON u.id = up.user_id
         WHERE u.id = ?
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
