@@ -1647,11 +1647,29 @@ async function loadSocial() {
         // Mise à jour du nom d'utilisateur dans la sidebar
         const userPill = document.getElementById('connectedUsername');
         if (userPill) {
-            const name = (fData.currentUser && fData.currentUser.username) || localStorage.getItem('username') || 'Utilisateur';
-            userPill.textContent = name;
-            // Aussi mettre à jour le localStorage pour cohérence
-            if (fData.currentUser && fData.currentUser.username) {
-                localStorage.setItem('username', fData.currentUser.username);
+            const storedUsername = localStorage.getItem('username');
+            if (storedUsername && storedUsername !== 'undefined' && storedUsername !== 'null') {
+                userPill.textContent = storedUsername;
+            } else {
+                // Essayer de récupérer le username depuis l'API
+                userPill.textContent = 'Chargement...';
+                try {
+                    const profileRes = await fetchProtected('/api/user/profile');
+                    if (profileRes.ok) {
+                        const profile = await profileRes.json();
+                        if (profile.username) {
+                            localStorage.setItem('username', profile.username);
+                            userPill.textContent = profile.username;
+                        } else {
+                            userPill.textContent = 'Utilisateur';
+                        }
+                    } else {
+                        userPill.textContent = 'Utilisateur';
+                    }
+                } catch (err) {
+                    console.error('Erreur récupération username:', err);
+                    userPill.textContent = 'Utilisateur';
+                }
             }
         }
 
