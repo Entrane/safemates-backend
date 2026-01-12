@@ -7,9 +7,9 @@
 // Configuration de la base de données
 // Hostinger utilise MySQL par défaut
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'matchmates');
-define('DB_USER', 'root'); // À remplacer par vos identifiants Hostinger
-define('DB_PASS', ''); // À remplacer par votre mot de passe Hostinger
+define('DB_NAME', 'u639530603_SafeMates');
+define('DB_USER', 'u639530603_Entrane');
+define('DB_PASS', 'En70frevaern@');
 
 // Pour SQLite (alternative si MySQL n'est pas disponible)
 define('USE_SQLITE', false); // Mettre à true pour utiliser SQLite au lieu de MySQL
