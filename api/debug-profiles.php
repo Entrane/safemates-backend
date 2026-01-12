@@ -1,51 +1,45 @@
 <?php
 /**
- * Fichier de debug pour voir les profils dans la base de données
- * À SUPPRIMER après débogage
+ * Script de diagnostic pour vérifier les profils utilisateurs
  */
 
 require_once 'config.php';
 
-// Vérifier l'authentification
-$user = requireAuth();
+header('Content-Type: application/json; charset=utf-8');
 
 try {
     $db = getDB();
 
-    // Récupérer TOUS les profils
-    $stmt = $db->prepare("
+    // Récupérer tous les profils de jeu avec les infos utilisateur
+    $stmt = $db->query("
         SELECT
-            u.id as user_id,
+            gp.id as profile_id,
+            gp.user_id,
             u.username,
             gp.game,
             gp.rank,
             gp.mode,
-            gp.tolerance
+            gp.tolerance,
+            gp.preferred_ranks,
+            gp.updated_at,
+            us.last_activity
         FROM game_profiles gp
         JOIN users u ON gp.user_id = u.id
-        ORDER BY gp.game, u.username
+        LEFT JOIN user_sessions us ON u.id = us.user_id
+        ORDER BY u.username, gp.game
     ");
-    $stmt->execute();
+
     $profiles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Récupérer mon profil
-    $stmt = $db->prepare("
-        SELECT game, rank, mode, tolerance
-        FROM game_profiles
-        WHERE user_id = ?
-    ");
-    $stmt->execute([$user['userId']]);
-    $myProfiles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    sendJSON([
+    echo json_encode([
         'success' => true,
-        'myUserId' => $user['userId'],
-        'myProfiles' => $myProfiles,
-        'allProfiles' => $profiles
-    ], 200);
+        'total_profiles' => count($profiles),
+        'profiles' => $profiles
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $e) {
-    error_log("Erreur debug profiles: " . $e->getMessage());
-    sendJSON(['error' => 'Erreur lors de la récupération des profils', 'details' => $e->getMessage()], 500);
+    echo json_encode([
+        'error' => $e->getMessage()
+    ], JSON_PRETTY_PRINT);
 }
 ?>

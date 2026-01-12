@@ -1661,7 +1661,7 @@
 
             console.log('Envoi des paramétres:', settingsPayload);
 
-            const settingsRes = await fetchProtected('/api/game/settings', {
+            const settingsRes = await fetchProtected('/api/game/settings.php', {
                 method: 'POST',
                 body: JSON.stringify(settingsPayload)
             });
@@ -1685,7 +1685,7 @@
                 rankTolerance: userGameData.rankTolerance
              };
 
-             const prefsRes = await fetchProtected('/api/game/preferences', {
+             const prefsRes = await fetchProtected('/api/game/preferences.php', {
                 method: 'POST',
                 body: JSON.stringify(prefsPayload)
             });
