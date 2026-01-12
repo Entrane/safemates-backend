@@ -1696,7 +1696,8 @@
             console.log('💾 Sauvegarde du profil:', profilePayload);
 
             try {
-                const response = await fetchProtected(`/api/profile/${gameId}`, {
+                // Utiliser le paramètre GET directement (la route .htaccess ne fonctionne pas toujours)
+                const response = await fetchProtected(`/api/profile.php?game=${gameId}`, {
                     method: 'POST',
                     body: JSON.stringify(profilePayload)
                 });
