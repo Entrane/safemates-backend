@@ -65,6 +65,15 @@ try {
 
     $tolerance = (int)$myProfile['tolerance'];
     $preferredRanks = json_decode($myProfile['preferred_ranks'] ?? '[]', true);
+    $myRank = $myProfile['rank'];
+    $myRankIndex = array_search($myRank, $allRanks);
+    if ($myRankIndex === false) {
+        $myRankIndex = 0;
+    }
+
+    // Calculer les indices min/max pour le logging
+    $minRankIndex = max(0, $myRankIndex - $tolerance);
+    $maxRankIndex = min(count($allRanks) - 1, $myRankIndex + $tolerance);
 
     // Si l'utilisateur a spécifié des rangs préférés, les utiliser avec tolérance
     if (!empty($preferredRanks) && is_array($preferredRanks)) {
@@ -86,14 +95,6 @@ try {
         }
     } else {
         // Utiliser le rang de l'utilisateur avec tolérance
-        $myRank = $myProfile['rank'];
-        $myRankIndex = array_search($myRank, $allRanks);
-        if ($myRankIndex === false) {
-            $myRankIndex = 0;
-        }
-
-        $minRankIndex = max(0, $myRankIndex - $tolerance);
-        $maxRankIndex = min(count($allRanks) - 1, $myRankIndex + $tolerance);
         $acceptableRanks = array_slice($allRanks, $minRankIndex, $maxRankIndex - $minRankIndex + 1);
     }
 
