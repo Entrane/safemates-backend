@@ -9,6 +9,9 @@ require_once __DIR__ . '/../config.php';
 // Vérifier l'authentification (session OU token JWT)
 $user = requireAuth();
 
+// Forcer la conversion du user_id en entier pour éviter les problèmes de comparaison
+$currentUserId = (int)$user['userId'];
+
 // Récupérer le jeu depuis l'URL ou les paramètres GET
 $game = '';
 
@@ -35,7 +38,7 @@ try {
         FROM game_profiles
         WHERE user_id = ? AND game = ?
     ');
-    $stmt->execute([$user['userId'], $game]);
+    $stmt->execute([$currentUserId, $game]);
     $myProfile = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$myProfile) {
@@ -95,6 +98,8 @@ try {
     }
 
     // Log de débogage
+    error_log("DEBUG SEARCH - User ID: $currentUserId (type: " . gettype($currentUserId) . ")");
+    error_log("DEBUG SEARCH - Game: $game");
     error_log("DEBUG SEARCH - Mon rang: $myRank, Index: $myRankIndex, Tolérance: $tolerance");
     error_log("DEBUG SEARCH - Min index: $minRankIndex, Max index: $maxRankIndex");
     error_log("DEBUG SEARCH - Rangs acceptables: " . implode(', ', $acceptableRanks));
@@ -128,14 +133,20 @@ try {
         LIMIT 10
     ");
 
-    $params = array_merge([$game, $user['userId']], $acceptableRanks);
+    $params = array_merge([$game, $currentUserId], $acceptableRanks);
+    error_log("DEBUG SEARCH - Params SQL: game=$game, exclude_user_id=$currentUserId, ranks=" . implode(',', $acceptableRanks));
     $stmt->execute($params);
     $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Filtrer pour être absolument sûr qu'on ne se voit pas soi-même
+    $matches = array_filter($matches, function($match) use ($currentUserId) {
+        return (int)$match['user_id'] !== $currentUserId;
+    });
 
     // Log des résultats
     error_log("DEBUG SEARCH - Nombre de matchs trouvés: " . count($matches));
     foreach ($matches as $match) {
-        error_log("DEBUG SEARCH - Match trouvé: " . $match['username'] . " - Rang: " . $match['rank']);
+        error_log("DEBUG SEARCH - Match trouvé: user_id=" . $match['user_id'] . " (type: " . gettype($match['user_id']) . "), username=" . $match['username'] . ", rang=" . $match['rank']);
     }
 
     // Formater les résultats
