@@ -9,14 +9,41 @@
  */
 function getRankMap() {
     return [
+        // Fer / Iron
         'fer1' => 1, 'fer2' => 2, 'fer3' => 3,
+        'iron1' => 1, 'iron2' => 2, 'iron3' => 3,
+
+        // Bronze
         'bronze1' => 4, 'bronze2' => 5, 'bronze3' => 6,
+
+        // Argent / Silver
         'argent1' => 7, 'argent2' => 8, 'argent3' => 9,
+        'silver1' => 7, 'silver2' => 8, 'silver3' => 9,
+
+        // Or / Gold
         'or1' => 10, 'or2' => 11, 'or3' => 12,
+        'gold' => 11, 'gold1' => 10, 'gold2' => 11, 'gold3' => 12,
+
+        // Platine / Platinum
         'platine1' => 13, 'platine2' => 14, 'platine3' => 15,
+        'platinum1' => 13, 'platinum2' => 14, 'platinum3' => 15,
+        'plat1' => 13, 'plat2' => 14, 'plat3' => 15,
+
+        // Diamant / Diamond
         'diamant1' => 16, 'diamant2' => 17, 'diamant3' => 18,
+        'diamond1' => 16, 'diamond2' => 17, 'diamond3' => 18,
+
+        // Ascendant
         'ascendant1' => 19, 'ascendant2' => 20, 'ascendant3' => 21,
+
+        // Immortal
         'immortal1' => 22, 'immortal2' => 23, 'immortal3' => 24,
+        'immortal_1' => 22, 'immortal_2' => 23, 'immortal_3' => 24,
+
+        // Master (approximation)
+        'master' => 23,
+
+        // Radiant
         'radiant' => 25
     ];
 }
