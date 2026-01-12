@@ -129,11 +129,30 @@ function verifyToken($token) {
 
 // Fonction pour obtenir le token depuis les headers
 function getAuthToken() {
-    $headers = getallheaders();
+    // Compatibilité: getallheaders() n'existe pas toujours
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+    } else {
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+    }
 
+    // Vérifier Authorization header
     if (isset($headers['Authorization'])) {
         $matches = [];
         if (preg_match('/Bearer\s+(.*)$/i', $headers['Authorization'], $matches)) {
+            return $matches[1];
+        }
+    }
+
+    // Alternative: HTTP_AUTHORIZATION
+    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $matches = [];
+        if (preg_match('/Bearer\s+(.*)$/i', $_SERVER['HTTP_AUTHORIZATION'], $matches)) {
             return $matches[1];
         }
     }
