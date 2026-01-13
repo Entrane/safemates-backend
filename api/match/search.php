@@ -87,6 +87,7 @@ try {
         JOIN users u ON u.id = gp.user_id
         JOIN user_sessions us ON u.id = us.user_id
         WHERE gp.game = :game
+          AND gp.rank_level IS NOT NULL
           AND ABS(gp.rank_level - :user_rank_level) <= :user_tolerance
           AND gp.user_id != :current_user_id
           AND u.is_banned = 0
