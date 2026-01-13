@@ -68,10 +68,16 @@ try {
         $stmt->execute([$userId]);
         $receivedRequests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Ajouter aussi le currentUser pour afficher le nom dans la sidebar
+        $stmtUser = $db->prepare("SELECT username FROM users WHERE id = ?");
+        $stmtUser->execute([$userId]);
+        $currentUser = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
         sendJSON([
+            'currentUser' => $currentUser,
             'friends' => $friends,
-            'sent_requests' => $sentRequests,
-            'received_requests' => $receivedRequests
+            'outgoingRequests' => $sentRequests,
+            'incomingRequests' => $receivedRequests
         ]);
     }
 

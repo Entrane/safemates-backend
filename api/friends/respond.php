@@ -20,14 +20,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = getJsonInput();
 $friendId = $input['friend_id'] ?? null;
+$friendUsername = $input['username'] ?? null;
 $action = $input['action'] ?? null; // 'accept' ou 'reject'
 
-if (!$friendId || !$action) {
+if ((!$friendId && !$friendUsername) || !$action) {
     sendJSON(['error' => 'Paramètres manquants'], 400);
 }
 
 try {
     $db = getDB();
+
+    // Si on a un username, convertir en ID
+    if ($friendUsername && !$friendId) {
+        $stmt = $db->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->execute([$friendUsername]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user) {
+            sendJSON(['error' => 'Utilisateur non trouvé'], 404);
+        }
+        $friendId = $user['id'];
+    }
 
     if ($action === 'accept') {
         // Accepter la demande
@@ -36,7 +48,7 @@ try {
             SET status = 'accepted', updated_at = NOW()
             WHERE user_id = ? AND friend_id = ? AND status = 'pending'
         ");
-        $stmt->execute([$friendId, $_SESSION['user_id']]);
+        $stmt->execute([$friendId, $userId]);
 
         sendJSON(['success' => true, 'message' => 'Demande acceptée']);
 
@@ -46,7 +58,7 @@ try {
             DELETE FROM friendships
             WHERE user_id = ? AND friend_id = ? AND status = 'pending'
         ");
-        $stmt->execute([$friendId, $_SESSION['user_id']]);
+        $stmt->execute([$friendId, $userId]);
 
         sendJSON(['success' => true, 'message' => 'Demande refusée']);
     } else {
