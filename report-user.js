@@ -21,12 +21,12 @@
 
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Raison du signalement *</label>
-                            <select id="reportReason" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                                <option value="">S&eacute;lectionnez une raison</option>
+                            <select id="reportReason" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: white; color: #333; position: relative; z-index: 1;">
+                                <option value="">Sélectionnez une raison</option>
                                 <option value="harassment">Harcèlement</option>
                                 <option value="hate_speech">Discours haineux / Insultes</option>
-                                <option value="inappropriate_content">Contenu inappropri&eacute;</option>
-                                <option value="spam">Spam / Publicit&eacute;</option>
+                                <option value="inappropriate_content">Contenu inapproprié</option>
+                                <option value="spam">Spam / Publicité</option>
                                 <option value="cheating">Triche</option>
                                 <option value="charter_violation">Violation de la charte</option>
                                 <option value="other">Autre</option>

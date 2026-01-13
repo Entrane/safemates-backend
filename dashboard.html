@@ -2449,6 +2449,15 @@ INITIALISATION FINALE
         const menu = document.createElement('div');
         menu.id = 'friend-menu-global';
         menu.className = 'friend-menu-dropdown show';
+        menu.style.position = 'fixed';
+        menu.style.zIndex = '99999';
+        menu.style.background = '#1a1d2e';
+        menu.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        menu.style.borderRadius = '8px';
+        menu.style.minWidth = '180px';
+        menu.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.5)';
+        menu.style.overflow = 'hidden';
+
         menu.innerHTML = `
             <button class="friend-menu-item" onclick="window.reportFriend('${username}')">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -2462,10 +2471,8 @@ INITIALISATION FINALE
 
         // Positionner le menu
         const rect = e.target.closest('button').getBoundingClientRect();
-        menu.style.position = 'fixed';
         menu.style.top = rect.bottom + 4 + 'px';
         menu.style.right = window.innerWidth - rect.right + 'px';
-        menu.style.zIndex = '99999';
 
         document.body.appendChild(menu);
         console.log('Menu créé et ajouté au body');
@@ -2496,10 +2503,18 @@ INITIALISATION FINALE
             });
 
             if (response.ok) {
-                alert('Ami supprimé avec succès');
+                // Fermer le chat s'il est ouvert
+                if (typeof window.closeChat === 'function') {
+                    window.closeChat(username);
+                }
+
+                // Recharger la liste d'amis
                 loadSocial();
+
+                alert('Ami supprimé avec succès');
             } else {
-                alert('Erreur lors de la suppression');
+                const error = await response.json();
+                alert('Erreur: ' + (error.error || 'Erreur lors de la suppression'));
             }
         } catch (error) {
             console.error('Erreur:', error);
