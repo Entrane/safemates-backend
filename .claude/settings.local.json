@@ -66,7 +66,11 @@
       "Bash(./deploy-api.bat)",
       "Bash(./deploy-fix.bat)",
       "Bash(find:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run watch:*)",
+      "Bash(start index-proposal.html)"
     ],
     "deny": [],
     "ask": []
