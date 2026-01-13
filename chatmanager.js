@@ -172,7 +172,7 @@ class ChatManager {
     
     // Vérifier si c'est notre propre message
     isOwnMessage(message) {
-        return message.sender_id === this.currentUserId;
+        return message.from_user_id === this.currentUserId || message.from_username === this.currentUsername;
     }
     
     // Démarrer le polling global
