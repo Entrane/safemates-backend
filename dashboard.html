@@ -1944,10 +1944,10 @@ function renderFriends(list) {
             </div>
             ${unreadCount > 0 ? `<span class="friend-card-badge" id="badge-${f.username}">${unreadCount}</span>` : ''}
             <div class="friend-menu-container">
-                <button type="button" class="friend-menu-btn" data-username="${f.username}">
+                <button type="button" class="friend-menu-btn" data-username="${f.username}" style="position: relative; z-index: 100;">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
-                <div class="friend-menu-dropdown">
+                <div class="friend-menu-dropdown" style="background: red !important; border: 3px solid yellow !important;">
                     <button class="friend-menu-item report-friend-btn" data-username="${f.username}">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>Signaler</span>
