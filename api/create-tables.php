@@ -88,6 +88,30 @@ try {
     ");
     echo "✅ Table 'notifications' créée\n\n";
 
+    // Table game_profiles
+    echo "Création de la table 'game_profiles'...\n";
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS game_profiles (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            game VARCHAR(50) NOT NULL,
+            rank VARCHAR(50),
+            rank_level INT,
+            mode VARCHAR(100),
+            style VARCHAR(50),
+            tolerance INT DEFAULT 1,
+            options JSON,
+            preferred_ranks JSON,
+            availability JSON,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_user_game (user_id, game),
+            INDEX idx_rank_level (rank_level),
+            UNIQUE KEY unique_user_game (user_id, game)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    echo "✅ Table 'game_profiles' créée\n\n";
+
     echo str_repeat("=", 50) . "\n";
     echo "🎉 TOUTES LES TABLES ONT ÉTÉ CRÉÉES AVEC SUCCÈS !\n";
     echo str_repeat("=", 50) . "\n\n";

@@ -42,6 +42,47 @@ try {
         $user['preferred_games'] = json_decode($user['preferred_games'], true);
     }
 
+    // Si un gameId est fourni, récupérer les paramètres de jeu
+    $gameId = $_GET['gameId'] ?? null;
+
+    // Initialiser les données de jeu avec des valeurs par défaut
+    $user['gameSettings'] = [
+        'rank' => null,
+        'mainMode' => null,
+        'options' => [],
+        'style' => null
+    ];
+
+    $user['partnerPreferences'] = [
+        'prefRanks' => [],
+        'rankTolerance' => 1
+    ];
+
+    if ($gameId) {
+        // Récupérer les paramètres de jeu depuis game_profiles
+        $stmtGame = $db->prepare("
+            SELECT rank, mode, tolerance, availability, rank_level, preferred_ranks
+            FROM game_profiles
+            WHERE user_id = ? AND game = ?
+        ");
+        $stmtGame->execute([$userId, $gameId]);
+        $gameProfile = $stmtGame->fetch(PDO::FETCH_ASSOC);
+
+        if ($gameProfile) {
+            $user['gameSettings'] = [
+                'rank' => $gameProfile['rank'],
+                'mainMode' => $gameProfile['mode'],
+                'options' => [],
+                'style' => null
+            ];
+
+            $user['partnerPreferences'] = [
+                'prefRanks' => $gameProfile['preferred_ranks'] ? json_decode($gameProfile['preferred_ranks'], true) : [],
+                'rankTolerance' => $gameProfile['tolerance'] ?? 1
+            ];
+        }
+    }
+
     sendJSON($user);
 
 } catch (Exception $e) {
