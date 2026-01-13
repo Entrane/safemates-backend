@@ -7,8 +7,8 @@
 
     function createReportModal() {
         const modalHTML = `
-            <div id="reportUserModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-                <div style="background-color: white; margin: 5% auto; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+            <div id="reportUserModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);" onclick="window.closeReportModal()">
+                <div style="background-color: white; margin: 5% auto; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
                     <h2 style="margin: 0 0 20px 0; color: #333;">Signaler un utilisateur</h2>
 
                     <form id="reportUserForm">
@@ -35,7 +35,7 @@
 
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Description (optionnel)</label>
-                            <textarea id="reportDescription" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; min-height: 100px; font-family: inherit;" placeholder="D&eacute;crivez ce qui s'est pass&eacute;..."></textarea>
+                            <textarea id="reportDescription" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; min-height: 100px; font-family: inherit; color: #333; background: white;" placeholder="Décrivez ce qui s'est passé..."></textarea>
                         </div>
 
                         <div style="display: flex; gap: 10px; justify-content: flex-end;">
