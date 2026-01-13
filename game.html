@@ -1736,9 +1736,19 @@
             }
 
             // Calculer le rank_level (avec gameId)
+            console.log('🔍 Vérification du rang:', {
+                rank: userGameData.rank,
+                gameId: gameId,
+                availableRanks: RANK_LEVEL_MAPS[gameId] ? Object.keys(RANK_LEVEL_MAPS[gameId]) : 'gameId non trouvé'
+            });
+
             const rankLevel = getRankLevel(userGameData.rank, gameId);
+            console.log('📊 Résultat getRankLevel:', rankLevel);
+
             if (rankLevel === null) {
                 console.error('❌ Rang invalide:', userGameData.rank, 'pour le jeu:', gameId);
+                console.error('❌ RANK_LEVEL_MAPS disponibles:', Object.keys(RANK_LEVEL_MAPS));
+                console.error('❌ Rangs valides pour', gameId, ':', RANK_LEVEL_MAPS[gameId]);
                 alert('Erreur: rang invalide pour ce jeu');
                 return;
             }
