@@ -1973,28 +1973,37 @@ function renderFriends(list) {
         const menuBtn = d.querySelector('.friend-menu-btn');
         const menuDropdown = d.querySelector('.friend-menu-dropdown');
         if (menuBtn && menuDropdown) {
-            menuBtn.addEventListener('click', (e) => {
+            menuBtn.addEventListener('click', function(e) {
+                console.log('Click sur 3 points détecté!');
                 e.stopPropagation();
                 e.preventDefault();
 
-                // Fermer tous les autres menus ouverts
-                document.querySelectorAll('.friend-menu-dropdown.show').forEach(dropdown => {
-                    if (dropdown !== menuDropdown) {
-                        dropdown.classList.remove('show');
+                try {
+                    // Fermer tous les autres menus
+                    const allMenus = document.querySelectorAll('.friend-menu-dropdown.show');
+                    allMenus.forEach(function(dropdown) {
+                        if (dropdown !== menuDropdown) {
+                            dropdown.classList.remove('show');
+                        }
+                    });
+
+                    // Toggle le menu actuel
+                    const isShowing = menuDropdown.classList.toggle('show');
+                    console.log('Menu show:', isShowing);
+
+                    // Positionner le menu
+                    if (isShowing) {
+                        const rect = menuBtn.getBoundingClientRect();
+                        menuDropdown.style.top = rect.bottom + 4 + 'px';
+                        menuDropdown.style.left = rect.left - 150 + 'px';
+                        console.log('Menu positionné à:', rect.bottom + 4, rect.left - 150);
                     }
-                });
-
-                // Toggle le menu actuel
-                const isShowing = menuDropdown.classList.toggle('show');
-
-                // Positionner le menu en fixed
-                if (isShowing) {
-                    const rect = menuBtn.getBoundingClientRect();
-                    menuDropdown.style.top = `${rect.bottom + 4}px`;
-                    menuDropdown.style.left = `${rect.left - 150}px`; // 150px à gauche du bouton
-                    console.log('Menu positionné:', rect.bottom + 4, rect.left - 150);
+                } catch (error) {
+                    console.error('Erreur menu:', error);
                 }
             });
+        } else {
+            console.warn('Menu btn ou dropdown non trouvé');
         }
 
         // Ajouter le gestionnaire pour le bouton de signalement
