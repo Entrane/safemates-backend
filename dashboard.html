@@ -1991,7 +1991,8 @@ function renderFriends(list) {
                 if (isShowing) {
                     const rect = menuBtn.getBoundingClientRect();
                     menuDropdown.style.top = `${rect.bottom + 4}px`;
-                    menuDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                    menuDropdown.style.left = `${rect.left - 150}px`; // 150px à gauche du bouton
+                    console.log('Menu positionné:', rect.bottom + 4, rect.left - 150);
                 }
             });
         }
