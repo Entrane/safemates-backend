@@ -166,9 +166,9 @@
       line-height: 1.6;
     }
 
-    @media (max-width: 968px) {
+    @media (max-width: 1200px) {
       .comparison {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
       }
     }
   </style>
@@ -178,10 +178,10 @@
     <h1>🎨 Comparaison des Styles SafeMates</h1>
     <p class="subtitle">Choisissez le style qui vous plaît le plus</p>
 
-    <div class="comparison">
+    <div class="comparison" style="grid-template-columns: repeat(3, 1fr); gap: 24px;">
       <!-- Style Actuel (Vert) -->
       <div class="preview-card old">
-        <h2>✅ Style Actuel (Vert)</h2>
+        <h2>✅ Style Actuel</h2>
 
         <h4>Palette de couleurs</h4>
         <div class="color-palette">
@@ -202,9 +202,9 @@
         <a href="index.html" class="cta-button btn-old">Voir le style actuel</a>
       </div>
 
-      <!-- Nouveau Style (Bleu Électrique) -->
+      <!-- Style Bleu Électrique -->
       <div class="preview-card new">
-        <h2>✨ Nouveau Style (Bleu Électrique)</h2>
+        <h2>💙 Bleu Électrique</h2>
 
         <h4>Palette de couleurs</h4>
         <div class="color-palette">
@@ -224,7 +224,34 @@
           <li>🎭 Backdrop blur</li>
         </ul>
 
-        <a href="index-blue-demo.html" class="cta-button btn-new">Voir la démo ✨</a>
+        <a href="index-blue-demo.html" class="cta-button btn-new">Voir la démo 💙</a>
+      </div>
+
+      <!-- Nouveau Style Multicolore Animé -->
+      <div class="preview-card new">
+        <h2>🌈 Multicolore Animé (NOUVEAU)</h2>
+
+        <h4>Palette de couleurs</h4>
+        <div class="color-palette">
+          <div class="color-swatch" style="background: #00d4ff;">#00d4ff</div>
+          <div class="color-swatch" style="background: #a855f7;">#a855f7</div>
+          <div class="color-swatch" style="background: #ec4899;">#ec4899</div>
+          <div class="color-swatch" style="background: #f97316;">#f97316</div>
+          <div class="color-swatch" style="background: linear-gradient(135deg, #00d4ff, #a855f7, #ec4899, #f97316);">Multi</div>
+        </div>
+
+        <h4>Caractéristiques</h4>
+        <ul class="features">
+          <li>🌈 Palette multicolore (cyan, violet, rose, orange)</li>
+          <li>💫 Arrière-plan animé avec orbes flottants</li>
+          <li>✨ Effets de lumière en mouvement</li>
+          <li>🎨 Bordures dégradées arc-en-ciel</li>
+          <li>🌊 Animations fluides et continues</li>
+          <li>🎭 Grille de points animée</li>
+          <li>⚡ Chaque carte a sa propre couleur</li>
+        </ul>
+
+        <a href="index-multicolor-demo.html" class="cta-button btn-new" style="background: linear-gradient(135deg, #00d4ff, #a855f7, #ec4899);">Voir la démo 🌈</a>
       </div>
     </div>
 
