@@ -67,8 +67,11 @@ try {
     $userStyle = $myProfile['style'];
     $userTolerance = (int)$myProfile['tolerance'];
 
-    // Log de débogage
-    error_log("MATCHMAKING - User: {$currentUserId}, Game: {$game}, Rank Level: {$userRankLevel}, Mode: {$userMode}, Style: {$userStyle}, Tolerance: {$userTolerance}");
+    // Log de débogage détaillé
+    error_log("MATCHMAKING - User: {$currentUserId}, Game: {$game}");
+    error_log("  User Rank: {$myProfile['rank']} (level: {$userRankLevel})");
+    error_log("  Tolerance: {$userTolerance}");
+    error_log("  Range acceptée: " . ($userRankLevel - $userTolerance) . " à " . ($userRankLevel + $userTolerance));
 
     // Recherche SQL - Matching uniquement sur rank_level (avec tolérance)
     // Mode et style sont affichés mais ne filtrent pas
@@ -104,10 +107,12 @@ try {
 
     $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Log des résultats
+    // Log des résultats avec calcul de différence
     error_log("MATCHMAKING - Résultats trouvés: " . count($matches));
     foreach ($matches as $match) {
-        error_log("  - User: {$match['username']}, Rank: {$match['rank']} (level {$match['rank_level']}), Mode: {$match['mode']}, Style: {$match['style']}");
+        $diff = abs($match['rank_level'] - $userRankLevel);
+        $inRange = ($diff <= $userTolerance) ? 'OK' : 'HORS PLAGE!';
+        error_log("  - User: {$match['username']}, Rank: {$match['rank']} (level {$match['rank_level']}), Diff: {$diff}, Status: {$inRange}");
     }
 
     // Formater la réponse selon la spécification
