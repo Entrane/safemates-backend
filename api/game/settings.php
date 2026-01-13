@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../rank-mapping.php';
 
 // Vérifier que c'est bien une requête POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -30,6 +31,17 @@ if (empty($game)) {
     sendJSON(['error' => 'Le jeu est requis'], 400);
 }
 
+// Convertir le slug de rang en rank_level numérique
+$rankLevel = null;
+if ($rank) {
+    $rankLevel = getRankLevel($rank, $game);
+    if ($rankLevel === null) {
+        error_log("Rang invalide: game={$game}, rank={$rank}");
+        sendJSON(['error' => 'Rang invalide pour ce jeu'], 400);
+        exit;
+    }
+}
+
 try {
     $db = getDB();
 
@@ -45,11 +57,12 @@ try {
         // Mettre à jour le profil existant
         $stmt = $db->prepare('
             UPDATE game_profiles
-            SET rank = ?, mode = ?, tolerance = ?, style = ?, options = ?, updated_at = ?
+            SET rank = ?, rank_level = ?, mode = ?, tolerance = ?, style = ?, options = ?, updated_at = ?
             WHERE user_id = ? AND game = ?
         ');
         $stmt->execute([
             $rank,
+            $rankLevel,
             $mainMode,
             $rankTolerance,
             $style,
@@ -66,13 +79,14 @@ try {
     } else {
         // Créer un nouveau profil
         $stmt = $db->prepare('
-            INSERT INTO game_profiles (user_id, game, rank, mode, tolerance, style, options, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO game_profiles (user_id, game, rank, rank_level, mode, tolerance, style, options, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $user['userId'],
             $game,
             $rank,
+            $rankLevel,
             $mainMode,
             $rankTolerance,
             $style,
