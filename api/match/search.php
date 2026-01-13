@@ -33,6 +33,25 @@ if (empty($game)) {
 try {
     $db = getDB();
 
+    // AUTO-MIGRATION: Mettre à jour les rank_level manquants (migration automatique)
+    require_once __DIR__ . '/../rank-mapping.php';
+
+    $stmt = $db->query('SELECT id, game, rank, rank_level FROM game_profiles WHERE rank_level IS NULL AND rank IS NOT NULL');
+    $needsUpdate = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($needsUpdate) > 0) {
+        error_log("AUTO-MIGRATION: " . count($needsUpdate) . " profils sans rank_level détectés");
+
+        $updateStmt = $db->prepare('UPDATE game_profiles SET rank_level = ? WHERE id = ?');
+        foreach ($needsUpdate as $profile) {
+            $level = getRankLevel($profile['rank'], $profile['game']);
+            if ($level !== null) {
+                $updateStmt->execute([$level, $profile['id']]);
+                error_log("  - Profil #{$profile['id']}: {$profile['rank']} → {$level}");
+            }
+        }
+    }
+
     // Récupérer le profil de l'utilisateur pour ce jeu
     $stmt = $db->prepare('
         SELECT id, rank, rank_level, mode, style, tolerance
