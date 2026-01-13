@@ -1,33 +1,87 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./database.sqlite');
 
-// Copie exacte du RANK_MAP du serveur
-const RANK_MAP = {
-    'fer1': 1, 'fer2': 2, 'fer3': 3,
-    'bronze1': 4, 'bronze2': 5, 'bronze3': 6,
-    'argent1': 7, 'argent2': 8, 'argent3': 9,
-    'or1': 10, 'or2': 11, 'or3': 12,
-    'platine1': 13, 'platine2': 14, 'platine3': 15,
-    'diamant1': 16, 'diamant2': 17, 'diamant3': 18,
-    'ascendant_1': 19, 'ascendant_2': 20, 'ascendant_3': 21,
-    'immortal_1': 22, 'immortal_2': 23, 'immortal_3': 24,
-    'radiant': 25,
-    'iron': 1,
-    'bronze': 2,
-    'silver': 3,
-    'gold': 4,
-    'platinum': 5,
-    'emerald': 6,
-    'diamond': 7,
-    'master': 8,
-    'grandmaster': 9,
-    'challenger': 10,
+// Copie exacte du RANK_MAPS du serveur (séparé par jeu)
+const RANK_MAPS = {
+    valorant: {
+        'fer1': 1, 'fer2': 2, 'fer3': 3,
+        'bronze1': 4, 'bronze2': 5, 'bronze3': 6,
+        'argent1': 7, 'argent2': 8, 'argent3': 9,
+        'or1': 10, 'or2': 11, 'or3': 12,
+        'platine1': 13, 'platine2': 14, 'platine3': 15,
+        'diamant1': 16, 'diamant2': 17, 'diamant3': 18,
+        'ascendant_1': 19, 'ascendant_2': 20, 'ascendant_3': 21,
+        'immortal_1': 22, 'immortal_2': 23, 'immortal_3': 24,
+        'radiant': 25
+    },
+    lol: {
+        'iron': 1,
+        'bronze': 2,
+        'silver': 3,
+        'gold': 4,
+        'platinum': 5,
+        'emerald': 6,
+        'diamond': 7,
+        'master': 8,
+        'grandmaster': 9,
+        'challenger': 10
+    },
+    csgo: {
+        'silver': 1,
+        'silver2': 2,
+        'silver3': 3,
+        'silver4': 4,
+        'silver5': 5,
+        'silver6': 6,
+        'gold1': 7,
+        'gold2': 8,
+        'gold3': 9,
+        'gold4': 10,
+        'mg1': 11,
+        'mg2': 12,
+        'mge': 13,
+        'dmg': 14,
+        'le': 15,
+        'lem': 16,
+        'supreme': 17,
+        'global': 18
+    },
+    rocketleague: {
+        'bronze': 1,
+        'silver': 2,
+        'gold': 3,
+        'platine': 4,
+        'diamant': 5,
+        'champion': 6,
+        'grandchampion': 7
+    },
+    fortnite: {
+        'bronze': 1,
+        'silver': 2,
+        'gold': 3,
+        'platine': 4,
+        'diamant': 5,
+        'champion': 6,
+        'elite': 7,
+        'unreal': 8
+    },
+    warzone: {
+        'bronze': 1,
+        'silver': 2,
+        'gold': 3,
+        'platine': 4,
+        'diamant': 5,
+        'crimson': 6,
+        'iridescent': 7,
+        'top250': 8
+    }
 };
 
-function getRankValue(rankId) {
-    const val = RANK_MAP[rankId.toLowerCase()];
-    console.log(`  getRankValue('${rankId}') = ${val}`);
-    return val || 0;
+function getRankValue(rankId, gameId = 'valorant') {
+    const gameRanks = RANK_MAPS[gameId] || RANK_MAPS.valorant;
+    const val = gameRanks[rankId.toLowerCase()] || 0;
+    console.log(`  getRankValue('${rankId}', '${gameId}') = ${val}`);
+    return val;
 }
 
 console.log('🔍 TEST COMPLET DU MATCHMAKING\n');
@@ -50,7 +104,7 @@ db.serialize(() => {
         console.log('Mode:', settings.mainMode);
         console.log('Options:', settings.options);
 
-        const A_rankValue = getRankValue(settings.rank);
+        const A_rankValue = getRankValue(settings.rank, gameId);
         const A_tolerance = 1;
         const A_minRank = A_rankValue - A_tolerance;
         const A_maxRank = A_rankValue + A_tolerance;
@@ -129,8 +183,8 @@ db.serialize(() => {
                     console.log('  Mode:', match.mainMode);
                     console.log('  Options:', match.options);
 
-                    const B_rankValue = getRankValue(match.rank);
-                    const prefRankValues = A_prefs.prefRanks.map(r => getRankValue(r)).filter(Boolean);
+                    const B_rankValue = getRankValue(match.rank, gameId);
+                    const prefRankValues = A_prefs.prefRanks.map(r => getRankValue(r, gameId)).filter(Boolean);
 
                     let rankMatch;
                     if (prefRankValues.length > 0) {
