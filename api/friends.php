@@ -80,6 +80,81 @@ try {
             'incomingRequests' => $receivedRequests
         ]);
 
+    } elseif ($method === 'POST') {
+        // Envoyer ou accepter une demande d'ami
+        $input = getJsonInput();
+        $targetUsername = $input['username'] ?? null;
+        $action = $input['action'] ?? 'add'; // 'add' ou 'accept'
+
+        if (!$targetUsername) {
+            sendJSON(['error' => 'Paramètre username manquant'], 400);
+        }
+
+        // Récupérer l'ID de l'utilisateur cible
+        $stmt = $db->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->execute([$targetUsername]);
+        $targetUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$targetUser) {
+            sendJSON(['error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        $targetUserId = $targetUser['id'];
+
+        if ($action === 'accept') {
+            // Accepter une demande d'ami reçue
+            $stmt = $db->prepare("
+                UPDATE friendships
+                SET status = 'accepted'
+                WHERE user_id = ? AND friend_id = ? AND status = 'pending'
+            ");
+            $stmt->execute([$targetUserId, $userId]);
+
+            if ($stmt->rowCount() === 0) {
+                sendJSON(['error' => 'Aucune demande à accepter'], 404);
+            }
+
+            sendJSON([
+                'success' => true,
+                'message' => 'Demande d\'ami acceptée'
+            ]);
+
+        } else {
+            // Envoyer une nouvelle demande d'ami
+            if ($userId === $targetUserId) {
+                sendJSON(['error' => 'Vous ne pouvez pas vous ajouter vous-même'], 400);
+            }
+
+            // Vérifier s'il existe déjà une relation
+            $stmt = $db->prepare("
+                SELECT status FROM friendships
+                WHERE (user_id = ? AND friend_id = ?)
+                   OR (user_id = ? AND friend_id = ?)
+            ");
+            $stmt->execute([$userId, $targetUserId, $targetUserId, $userId]);
+            $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($existing) {
+                if ($existing['status'] === 'accepted') {
+                    sendJSON(['error' => 'Vous êtes déjà amis'], 400);
+                } else {
+                    sendJSON(['error' => 'Demande déjà envoyée'], 400);
+                }
+            }
+
+            // Créer la demande
+            $stmt = $db->prepare("
+                INSERT INTO friendships (user_id, friend_id, status, created_at)
+                VALUES (?, ?, 'pending', NOW())
+            ");
+            $stmt->execute([$userId, $targetUserId]);
+
+            sendJSON([
+                'success' => true,
+                'message' => 'Demande d\'ami envoyée'
+            ]);
+        }
+
     } elseif ($method === 'DELETE') {
         // Supprimer un ami
         $input = getJsonInput();
