@@ -135,9 +135,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $db->prepare("
             SELECT m.id, m.sender_id as from_user_id, m.recipient_id as to_user_id,
                    m.message as content, m.sent_at as created_at,
-                   u.username as from_username
+                   u1.username as from_username,
+                   u2.username as to_username
             FROM messages m
-            JOIN users u ON u.id = m.sender_id
+            JOIN users u1 ON u1.id = m.sender_id
+            JOIN users u2 ON u2.id = m.recipient_id
             WHERE m.id = ?
         ");
         $stmt->execute([$messageId]);
@@ -177,9 +179,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $db->prepare("
             SELECT m.id, m.sender_id as from_user_id, m.recipient_id as to_user_id,
                    m.message as content, m.sent_at as created_at,
-                   u.username as from_username
+                   u1.username as from_username,
+                   u2.username as to_username
             FROM messages m
-            JOIN users u ON u.id = m.sender_id
+            JOIN users u1 ON u1.id = m.sender_id
+            JOIN users u2 ON u2.id = m.recipient_id
             WHERE (m.sender_id = ? AND m.recipient_id = ?)
                OR (m.sender_id = ? AND m.recipient_id = ?)
             ORDER BY m.sent_at ASC
