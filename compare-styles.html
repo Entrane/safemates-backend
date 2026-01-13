@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparaison des Styles - SafeMates</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0f;
+      color: white;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #00d4ff, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 60px;
+      font-size: 18px;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .preview-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(20px);
+    }
+
+    .preview-card h2 {
+      margin-top: 0;
+      font-size: 32px;
+      margin-bottom: 15px;
+    }
+
+    .preview-card.old h2 {
+      color: #22c55e;
+    }
+
+    .preview-card.new h2 {
+      background: linear-gradient(135deg, #00d4ff, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .features {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .features li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+    }
+
+    .features li:last-child {
+      border-bottom: none;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn-old {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+
+    .btn-old:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-new {
+      background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+      color: #000;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-new:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+    }
+
+    .color-palette {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      padding: 10px;
+      font-size: 11px;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .instructions {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+      margin-top: 40px;
+    }
+
+    .instructions h3 {
+      color: #00d4ff;
+      margin-top: 0;
+    }
+
+    .instructions code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #00d4ff;
+      font-family: 'Courier New', monospace;
+    }
+
+    .instructions ol {
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin: 15px 0;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 968px) {
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Comparaison des Styles SafeMates</h1>
+    <p class="subtitle">Choisissez le style qui vous plaît le plus</p>
+
+    <div class="comparison">
+      <!-- Style Actuel (Vert) -->
+      <div class="preview-card old">
+        <h2>✅ Style Actuel (Vert)</h2>
+
+        <h4>Palette de couleurs</h4>
+        <div class="color-palette">
+          <div class="color-swatch" style="background: #22c55e;">#22c55e</div>
+          <div class="color-swatch" style="background: #020617;">#020617</div>
+          <div class="color-swatch" style="background: #3b82f6;">#3b82f6</div>
+        </div>
+
+        <h4>Caractéristiques</h4>
+        <ul class="features">
+          <li>✓ Vert gaming classique</li>
+          <li>✓ Fond bleu nuit</li>
+          <li>✓ Design sobre et professionnel</li>
+          <li>✓ Bien testé et stable</li>
+          <li>✓ Responsive</li>
+        </ul>
+
+        <a href="index.html" class="cta-button btn-old">Voir le style actuel</a>
+      </div>
+
+      <!-- Nouveau Style (Bleu Électrique) -->
+      <div class="preview-card new">
+        <h2>✨ Nouveau Style (Bleu Électrique)</h2>
+
+        <h4>Palette de couleurs</h4>
+        <div class="color-palette">
+          <div class="color-swatch" style="background: #00d4ff;">#00d4ff</div>
+          <div class="color-swatch" style="background: #000000;">#000000</div>
+          <div class="color-swatch" style="background: #7c3aed;">#7c3aed</div>
+          <div class="color-swatch" style="background: linear-gradient(135deg, #00d4ff, #7c3aed);">Gradient</div>
+        </div>
+
+        <h4>Caractéristiques</h4>
+        <ul class="features">
+          <li>✨ Glassmorphism (effet verre)</li>
+          <li>💫 Effets néon et glow</li>
+          <li>🌟 Animations fluides</li>
+          <li>🎨 Inspiré de Midjourney</li>
+          <li>⚡ Bleu électrique moderne</li>
+          <li>🎭 Backdrop blur</li>
+        </ul>
+
+        <a href="index-blue-demo.html" class="cta-button btn-new">Voir la démo ✨</a>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <h3>📖 Comment tester et choisir ?</h3>
+
+      <ol>
+        <li>
+          <strong>Testez la démo</strong><br>
+          Cliquez sur "Voir la démo ✨" pour voir le nouveau style en action
+        </li>
+
+        <li>
+          <strong>Comparez les deux versions</strong><br>
+          Ouvrez les deux pages dans des onglets différents pour comparer
+        </li>
+
+        <li>
+          <strong>Pour appliquer le nouveau style sur tout le site :</strong><br>
+          Remplacez dans tous vos fichiers HTML :
+          <br><br>
+          Ancien :
+          <br>
+          <code>&lt;link rel="stylesheet" href="style.css" /&gt;</code><br>
+          <code>&lt;link rel="stylesheet" href="style-enhanced.css" /&gt;</code><br>
+          <code>&lt;link rel="stylesheet" href="components.css" /&gt;</code>
+          <br><br>
+          Par :
+          <br>
+          <code>&lt;link rel="stylesheet" href="style-blue-electric.css" /&gt;</code>
+        </li>
+
+        <li>
+          <strong>Pour revenir en arrière :</strong><br>
+          Si vous n'aimez pas, utilisez Git :<br>
+          <code>git checkout main</code>
+          <br>
+          Tous vos fichiers originaux sont préservés !
+        </li>
+      </ol>
+
+      <h3 style="margin-top: 30px;">💡 Besoin d'aide ?</h3>
+      <p style="color: #94a3b8;">
+        Vous pouvez demander des ajustements de couleurs, d'animations, ou tout autre modification.
+        Tous les changements sont réversibles grâce à Git !
+      </p>
+    </div>
+  </div>
+</body>
+</html>
