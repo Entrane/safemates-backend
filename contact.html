@@ -199,7 +199,7 @@
         <div class="contact-actions">
           <button type="submit" class="btn-submit">Envoyer</button>
           <div class="contact-note">
-            Si rien ne se passe, copie l’adresse <a href="mailto:matchmatecontact@gmail.com">matchmatecontact@gmail.com</a> et envoie-nous ton message via ton webmail.
+            Si rien ne se passe, copie l'adresse <a href="mailto:matchmates@contact.com">matchmates@contact.com</a> et envoie-nous ton message via ton webmail.
           </div>
         </div>
       </form>
@@ -216,13 +216,13 @@
     "mainEntity": {
       "@type": "Organization",
       "name": "SafeMates",
-      "email": "matchmatecontact@gmail.com",
+      "email": "matchmates@contact.com",
       "url": "https://www.SafeMates.fr",
       "logo": "https://www.SafeMates.fr/Image/Logo safe mate.png",
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer support",
-        "email": "matchmatecontact@gmail.com",
+        "email": "matchmates@contact.com",
         "availableLanguage": ["French"]
       }
     }
@@ -298,7 +298,7 @@
           console.error('Erreur envoi formulaire:', error);
           // Fallback sur mailto: en cas d'erreur
           const body = `Nom/Pseudo: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
-          const mailto = `mailto:matchmatecontact@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+          const mailto = `mailto:matchmates@contact.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
           window.location.href = mailto;
           alert('⚠️ Erreur d\'envoi. Votre client mail va s\'ouvrir.');
         } finally {
