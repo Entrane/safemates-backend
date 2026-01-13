@@ -1979,7 +1979,15 @@
                 body:JSON.stringify({receiverUsername:username})
             });
             const d = await res.json();
-            alert(d.message || d.error || `Demande d'ami envoyée à ${username} !`);
+
+            // Afficher le debug si disponible
+            let message = d.message || d.error || `Demande d'ami envoyée à ${username} !`;
+            if (d.debug) {
+                console.error('DEBUG SQL Error:', d.debug);
+                message += '\n\nDébug: ' + d.debug;
+            }
+
+            alert(message);
             loadSocial(); // Rafraîchit la sidebar
         };
 
