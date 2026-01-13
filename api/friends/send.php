@@ -72,21 +72,38 @@ try {
         INSERT INTO friendships (user_id, friend_id, status, created_at)
         VALUES (?, ?, 'pending', NOW())
     ");
-    $stmt->execute([$userId, $friendId]);
 
-    sendJSON(['success' => true, 'message' => 'Demande envoyée']);
+    $insertSuccess = $stmt->execute([$userId, $friendId]);
+
+    if ($insertSuccess) {
+        sendJSON(['success' => true, 'message' => 'Demande envoyée']);
+    } else {
+        $errorInfo = $stmt->errorInfo();
+        error_log("Insert failed - SQL State: " . $errorInfo[0] . ", Error: " . $errorInfo[2]);
+        sendJSON(['error' => 'Impossible d\'envoyer la demande'], 500);
+    }
 
 } catch (PDOException $e) {
     error_log("Erreur SQL /api/friends/send: " . $e->getMessage());
     error_log("SQL State: " . $e->getCode());
     error_log("Stack trace: " . $e->getTraceAsString());
 
-    // En mode debug, retourner le message d'erreur SQL
-    if (defined('DEBUG_MODE') && DEBUG_MODE) {
-        sendJSON(['error' => 'Erreur SQL: ' . $e->getMessage()], 500);
-    } else {
-        sendJSON(['error' => 'Erreur lors de l\'ajout en ami'], 500);
+    // Gérer les erreurs spécifiques
+    $errorMessage = 'Erreur lors de l\'ajout en ami';
+
+    // Contrainte de clé étrangère (utilisateur n'existe pas)
+    if (strpos($e->getMessage(), '1452') !== false || strpos($e->getMessage(), 'foreign key constraint') !== false) {
+        $errorMessage = 'Utilisateur introuvable';
+        error_log("Foreign key constraint violation - user may not exist");
     }
+
+    // Contrainte unique (demande déjà existante)
+    if (strpos($e->getMessage(), '1062') !== false || strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        $errorMessage = 'Demande d\'ami déjà existante';
+        error_log("Duplicate friendship entry");
+    }
+
+    sendJSON(['error' => $errorMessage], 500);
 } catch (Exception $e) {
     error_log("Erreur /api/friends/send: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
