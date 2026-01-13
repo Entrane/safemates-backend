@@ -1994,9 +1994,10 @@ function renderFriends(list) {
                     // Positionner le menu
                     if (isShowing) {
                         const rect = menuBtn.getBoundingClientRect();
+                        const menuWidth = 180;
                         menuDropdown.style.top = rect.bottom + 4 + 'px';
-                        menuDropdown.style.left = rect.left - 150 + 'px';
-                        console.log('Menu positionné à:', rect.bottom + 4, rect.left - 150);
+                        menuDropdown.style.left = rect.right - menuWidth + 'px'; // Aligné à droite du bouton
+                        console.log('Menu positionné à:', rect.bottom + 4, rect.right - menuWidth);
                     }
                 } catch (error) {
                     console.error('Erreur menu:', error);
