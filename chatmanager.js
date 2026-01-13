@@ -203,8 +203,8 @@ class ChatManager {
         try {
             const token = localStorage.getItem('token');
             if (!token) return;
-            
-            const response = await fetch(`/api/messages/${username}`, {
+
+            const response = await fetch(`/api/messages?with=${username}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
