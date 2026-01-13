@@ -162,7 +162,10 @@ function getAuthToken() {
 
 // Fonction pour vérifier l'authentification (session OU token JWT)
 function requireAuth() {
-    session_start();
+    // Démarrer la session seulement si elle n'est pas déjà démarrée
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
     // Priorité 1: Session PHP
     if (isset($_SESSION['user_id'])) {
@@ -187,7 +190,10 @@ function requireAuth() {
 
 // Fonction pour obtenir l'ID utilisateur depuis session ou token
 function getUserId() {
-    session_start();
+    // Démarrer la session seulement si elle n'est pas déjà démarrée
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
     // Priorité 1: Session PHP
     if (isset($_SESSION['user_id'])) {
