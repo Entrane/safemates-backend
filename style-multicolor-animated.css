@@ -872,3 +872,158 @@ footer {
   gap: 24px;
   margin-top: 40px;
 }
+
+/* ================================================
+   GAME.HTML SPECIFIC STYLES
+   ================================================ */
+
+/* Améliorer le blend des bandeaux avec le fond animé */
+.setting-box {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.setting-box:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.game-info-column {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* S'assurer que les boutons de mode de jeu sont visibles */
+.style-toggle {
+  position: relative;
+  z-index: 10;
+}
+
+.style-toggle button {
+  background: rgba(10, 15, 30, 0.9) !important;
+  border: 2px solid rgba(100, 116, 139, 0.5) !important;
+  color: var(--text-muted) !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  z-index: 1;
+}
+
+.style-toggle button:hover {
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  background: rgba(0, 212, 255, 0.1) !important;
+}
+
+.style-toggle button.active {
+  border-color: var(--cyan) !important;
+  background: rgba(0, 212, 255, 0.2) !important;
+  color: var(--text-main) !important;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+/* S'assurer que la grille de rangs est visible */
+.rank-grid {
+  position: relative;
+  z-index: 10;
+}
+
+.rank-option {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* S'assurer que le slider de tolérance de rang est visible */
+.range-selector {
+  position: relative;
+  z-index: 10;
+}
+
+#rankRange {
+  background: rgba(100, 116, 139, 0.5) !important;
+  position: relative;
+  z-index: 1;
+}
+
+#rankRange::-webkit-slider-thumb {
+  background: var(--cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+#rankRange::-moz-range-thumb {
+  background: var(--cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* S'assurer que le bouton de recherche de partenaire est visible et stylé */
+#partnerSearchButton {
+  background: linear-gradient(135deg, var(--orange) 0%, #ea580c 100%) !important;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
+  transition: all 0.3s ease !important;
+}
+
+#partnerSearchButton:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
+  box-shadow: 0 0 40px rgba(249, 115, 22, 0.6);
+  transform: translateY(-2px);
+}
+
+#partnerSearchButton.searching {
+  background: rgba(100, 116, 139, 0.5) !important;
+  box-shadow: none;
+}
+
+/* Améliorer les cartes de match */
+.match-card {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-left: 5px solid var(--cyan) !important;
+}
+
+/* Options radio/checkbox */
+.radio-option label {
+  background: rgba(10, 15, 30, 0.9) !important;
+  border: 2px solid rgba(100, 116, 139, 0.5) !important;
+}
+
+.radio-option label:hover {
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  background: rgba(0, 212, 255, 0.1) !important;
+}
+
+.radio-option input[type="radio"]:checked + label,
+.radio-option input[type="checkbox"]:checked + label {
+  border-color: var(--cyan) !important;
+  background: rgba(0, 212, 255, 0.2) !important;
+  color: var(--text-main) !important;
+}
+
+/* Titres de section dans game.html */
+.setting-title {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* S'assurer que tous les éléments interactifs sont au-dessus du fond */
+.main-content-column {
+  position: relative;
+  z-index: 5;
+}
+
+.game-layout {
+  position: relative;
+  z-index: 5;
+}
