@@ -79,6 +79,39 @@ try {
             'outgoingRequests' => $sentRequests,
             'incomingRequests' => $receivedRequests
         ]);
+
+    } elseif ($method === 'DELETE') {
+        // Supprimer un ami
+        $input = getJsonInput();
+        $friendUsername = $input['username'] ?? null;
+
+        if (!$friendUsername) {
+            sendJSON(['error' => 'Paramètre username manquant'], 400);
+        }
+
+        // Récupérer l'ID de l'ami
+        $stmt = $db->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->execute([$friendUsername]);
+        $friend = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$friend) {
+            sendJSON(['error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        $friendId = $friend['id'];
+
+        // Supprimer la relation d'amitié (dans les deux sens)
+        $stmt = $db->prepare("
+            DELETE FROM friendships
+            WHERE (user_id = ? AND friend_id = ?)
+               OR (user_id = ? AND friend_id = ?)
+        ");
+        $stmt->execute([$userId, $friendId, $friendId, $userId]);
+
+        sendJSON([
+            'success' => true,
+            'message' => 'Ami supprimé avec succès'
+        ]);
     }
 
 } catch (Exception $e) {
