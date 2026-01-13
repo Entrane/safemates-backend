@@ -140,6 +140,10 @@ try {
     // Joindre les conditions avec OR
     $rankConditionSQL = '(' . implode(' OR ', $rankConditions) . ')';
 
+    // Log de la requête SQL pour débogage
+    error_log("SQL Condition: " . $rankConditionSQL);
+    error_log("SQL Params: " . json_encode($params));
+
     // Recherche SQL - Matching sur rank_level avec préférences multiples
     $sql = "
         SELECT
@@ -162,8 +166,18 @@ try {
         LIMIT 10
     ";
 
+    error_log("Full SQL: " . $sql);
+
     $stmt = $db->prepare($sql);
-    $stmt->execute($params);
+
+    try {
+        $stmt->execute($params);
+    } catch (PDOException $e) {
+        error_log("SQL ERROR: " . $e->getMessage());
+        error_log("SQL Query: " . $sql);
+        error_log("SQL Params: " . json_encode($params));
+        throw $e;
+    }
 
     $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
