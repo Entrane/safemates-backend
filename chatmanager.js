@@ -163,11 +163,11 @@ class ChatManager {
     // Récupérer les messages avec un utilisateur
     getMessagesWithUser(username) {
         return Array.from(this.messages.values())
-            .filter(msg => 
-                (msg.sender_id === this.currentUserId && msg.receiver_username === username) ||
-                (msg.sender_username === username && msg.receiver_id === this.currentUserId)
+            .filter(msg =>
+                (msg.from_username === this.currentUsername && msg.to_username === username) ||
+                (msg.from_username === username && msg.to_username === this.currentUsername)
             )
-            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     }
     
     // Vérifier si c'est notre propre message
