@@ -18,6 +18,32 @@ echo "🚀 Démarrage du déploiement...\n\n";
 chdir($repoPath);
 echo "📂 Répertoire: $repoPath\n\n";
 
+// Vérifier si git est disponible
+echo "🔍 Vérification de Git...\n";
+exec('which git 2>&1', $gitCheck);
+if (empty($gitCheck)) {
+    echo "❌ Git n'est pas installé ou accessible sur ce serveur.\n";
+    echo "ℹ️  Contacte le support d'Hostinger pour activer Git.\n";
+} else {
+    echo "✅ Git trouvé: " . implode("\n", $gitCheck) . "\n\n";
+}
+
+// Vérifier l'état du repository
+echo "📋 État du repository Git...\n";
+exec('git status 2>&1', $statusOutput);
+foreach ($statusOutput as $line) {
+    echo $line . "\n";
+}
+echo "\n";
+
+// Vérifier la branche actuelle
+echo "🌿 Branche actuelle...\n";
+exec('git branch 2>&1', $branchOutput);
+foreach ($branchOutput as $line) {
+    echo $line . "\n";
+}
+echo "\n";
+
 // Exécuter git pull
 echo "📥 Récupération des dernières modifications...\n";
 $output = [];
@@ -36,6 +62,10 @@ if ($returnVar === 0) {
 } else {
     echo "\n❌ ERREUR lors du déploiement.\n";
     echo "\nCode de retour: $returnVar\n";
+    echo "\n💡 Solution alternative: Utilise le File Manager d'Hostinger pour:\n";
+    echo "   1. Télécharger le fichier game.html depuis GitHub\n";
+    echo "   2. Remplacer le fichier sur le serveur\n";
+    echo "   3. Rafraîchir avec Ctrl+F5\n";
 }
 
 echo "\n⚠️  SÉCURITÉ: Supprimez ce fichier deploy.php après utilisation !\n";
