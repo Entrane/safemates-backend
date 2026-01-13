@@ -2385,14 +2385,14 @@ window.hReq = async(event, username, action) => {
     }
 
     try {
-        // Seul l'accept/reject des requétes entrantes est géré par /api/friends/respond
-        if (action === 'accept' || action === 'reject') {
-            const payload = { 
-                senderUsername: username, 
-                action: action
+        // Accept/reject des demandes entrantes
+        if (action === 'accept') {
+            const payload = {
+                username: username,
+                action: 'accept'
             };
-            
-            const res = await fetchProtected('/api/friends/respond', {
+
+            const res = await fetchProtected('/api/friends.php', {
                 method:'POST',
                 body:JSON.stringify(payload)
             });
@@ -2400,15 +2400,37 @@ window.hReq = async(event, username, action) => {
             if (!res.ok) {
                 if (statusEl) {
                     statusEl.style.color = '#ef4444';
-                    statusEl.innerText = data.error || "Erreur lors de l'action sur la demande d'ami.";
+                    statusEl.innerText = data.error || "Erreur lors de l'acceptation";
                 } else {
-                    alert(data.error || "Erreur lors de l'action sur la demande d'ami.");
+                    alert(data.error || "Erreur lors de l'acceptation");
                 }
                 return;
             }
             if (statusEl) {
                 statusEl.style.color = '#22c55e';
-                statusEl.innerText = data.message || (action === 'accept' ? 'Ami ajouté.' : 'Demande refusée.');
+                statusEl.innerText = 'Ami ajouté';
+            }
+            if (card) card.remove();
+
+        } else if (action === 'reject') {
+            // Pour rejeter, on supprime la demande
+            const res = await fetchProtected('/api/friends.php', {
+                method:'DELETE',
+                body:JSON.stringify({ username: username })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                if (statusEl) {
+                    statusEl.style.color = '#ef4444';
+                    statusEl.innerText = data.error || "Erreur lors du rejet";
+                } else {
+                    alert(data.error || "Erreur lors du rejet");
+                }
+                return;
+            }
+            if (statusEl) {
+                statusEl.style.color = '#22c55e';
+                statusEl.innerText = 'Demande refusée';
             }
             if (card) card.remove();
         }
