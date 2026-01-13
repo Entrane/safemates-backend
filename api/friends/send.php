@@ -22,6 +22,9 @@ $input = getJsonInput();
 $friendId = $input['friend_id'] ?? null;
 $receiverUsername = $input['receiverUsername'] ?? null;
 
+// Log pour debug
+error_log("Friend request - userId: $userId, friendId: " . ($friendId ?? 'null') . ", receiverUsername: " . ($receiverUsername ?? 'null'));
+
 // Accepter soit friend_id soit receiverUsername
 if (!$friendId && !$receiverUsername) {
     sendJSON(['error' => 'ID ami ou pseudo manquant'], 400);
@@ -73,8 +76,20 @@ try {
 
     sendJSON(['success' => true, 'message' => 'Demande envoyée']);
 
+} catch (PDOException $e) {
+    error_log("Erreur SQL /api/friends/send: " . $e->getMessage());
+    error_log("SQL State: " . $e->getCode());
+    error_log("Stack trace: " . $e->getTraceAsString());
+
+    // En mode debug, retourner le message d'erreur SQL
+    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+        sendJSON(['error' => 'Erreur SQL: ' . $e->getMessage()], 500);
+    } else {
+        sendJSON(['error' => 'Erreur lors de l\'ajout en ami'], 500);
+    }
 } catch (Exception $e) {
     error_log("Erreur /api/friends/send: " . $e->getMessage());
-    sendJSON(['error' => 'Erreur serveur'], 500);
+    error_log("Stack trace: " . $e->getTraceAsString());
+    sendJSON(['error' => 'Erreur serveur: ' . $e->getMessage()], 500);
 }
 ?>
