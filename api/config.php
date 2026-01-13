@@ -28,22 +28,8 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
     ini_set('session.cookie_secure', 1);
 }
 
-// Headers de sécurité
-header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: SAMEORIGIN');
-header('X-XSS-Protection: 1; mode=block');
-header('Referrer-Policy: strict-origin-when-cross-origin');
-
-// CORS (si nécessaire)
-header('Access-Control-Allow-Origin: *'); // À restreindre en production
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
-// Gestion des requêtes OPTIONS (preflight)
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+// Note: Les headers HTTP sont gérés par .htaccess et par chaque endpoint
+// Ne pas envoyer de headers ici pour éviter les conflits
 
 // Fonction de connexion à la base de données
 function getDB() {
