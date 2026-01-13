@@ -1011,10 +1011,31 @@ footer {
 
 /* Titres de section dans game.html */
 .setting-title {
-  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+  background: linear-gradient(135deg,
+    var(--cyan) 0%,
+    var(--purple) 40%,
+    var(--pink) 70%,
+    var(--orange) 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Titre du jeu (ex: "Valorant") */
+.game-title-info {
+  background: linear-gradient(135deg,
+    var(--cyan) 0%,
+    var(--purple) 40%,
+    var(--pink) 70%,
+    var(--orange) 100%) !important;
+  background-size: 200% 200% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: gradient-shift 8s ease infinite !important;
+  color: transparent !important;
 }
 
 /* S'assurer que tous les éléments interactifs sont au-dessus du fond */
