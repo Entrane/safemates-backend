@@ -1880,20 +1880,29 @@
         }
 
         function renderMatches(matches) {
+            console.log('🎨 renderMatches appelé avec', matches.length, 'résultats');
+            console.log('🔍 matchListDiv existe?', !!matchListDiv);
+
             document.getElementById('matchCount').textContent = matches.length.toString();
-            if (!matchListDiv) return;
+            if (!matchListDiv) {
+                console.error('❌ matchListDiv est null - élément DOM manquant!');
+                return;
+            }
 
             if (matches.length === 0) {
+                console.log('⚠️ Aucun résultat - affichage du message');
                 matchListDiv.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding: 20px; background: var(--bg-card); border-radius: 8px;">Aucun partenaire trouvé avec ces critéres. Essayez de modifier votre tolérance de rang ou vos préférences.</p>`;
                 return;
             }
 
+            console.log('✅ Génération du HTML pour', matches.length, 'matchs');
             const matchHtml = matches.map(match => {
                 const gameRanks = RANKS[gameId.toLowerCase()] || [];
                 const rankInfo = gameRanks.find(r => r.id === match.rank) || { name: 'Non classé', img: '' };
 
                 // Construire l'affichage du mode avec options
-                let modeDisplay = match.mainMode || 'Non défini';
+                // FIX: L'API retourne 'mode' pas 'mainMode'
+                let modeDisplay = match.mode || match.mainMode || 'Non défini';
                 if (match.options && match.options.length > 0) {
                     modeDisplay += ` (${match.options.join(', ')})`;
                 }
@@ -1923,7 +1932,9 @@
                 `;
             }).join('');
 
+            console.log('📝 Injection du HTML dans matchListDiv (longueur:', matchHtml.length, 'caractères)');
             matchListDiv.innerHTML = matchHtml;
+            console.log('✅ HTML injecté - matchListDiv.children.length:', matchListDiv.children.length);
 
             // Attacher les événements avec addEventListener
             matchListDiv.querySelectorAll('.send-msg-match').forEach(btn => {
