@@ -1009,9 +1009,7 @@
     }
 
     .friend-menu-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
+        position: fixed;
         background: #1a1d2e;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
@@ -1019,8 +1017,7 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         display: none;
         flex-direction: column;
-        z-index: 9999;
-        margin-top: 4px;
+        z-index: 99999;
         overflow: hidden;
     }
 
@@ -1979,14 +1976,23 @@ function renderFriends(list) {
             menuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
+
                 // Fermer tous les autres menus ouverts
                 document.querySelectorAll('.friend-menu-dropdown.show').forEach(dropdown => {
                     if (dropdown !== menuDropdown) {
                         dropdown.classList.remove('show');
                     }
                 });
+
                 // Toggle le menu actuel
-                menuDropdown.classList.toggle('show');
+                const isShowing = menuDropdown.classList.toggle('show');
+
+                // Positionner le menu en fixed
+                if (isShowing) {
+                    const rect = menuBtn.getBoundingClientRect();
+                    menuDropdown.style.top = `${rect.bottom + 4}px`;
+                    menuDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                }
             });
         }
 
