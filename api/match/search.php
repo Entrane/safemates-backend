@@ -1,25 +1,26 @@
 <?php
 /**
- * API de recherche de partenaires de jeu
- * GET /api/match/search/{game}
+ * API de recherche de partenaires de jeu (refactorisée)
+ * GET /api/matchmaking/:gameSlug
+ * GET /api/match/search.php?game={game} (legacy)
+ *
+ * Logique selon spécification:
+ * - Matching par rank_level (numérique) avec tolérance
+ * - Filtrage exact par mode ET style
+ * - Utilisateurs en ligne uniquement (15 dernières minutes)
  */
 
 require_once __DIR__ . '/../config.php';
 
-// Vérifier l'authentification (session OU token JWT)
+// Vérifier l'authentification
 $user = requireAuth();
-
-// Forcer la conversion du user_id en entier pour éviter les problèmes de comparaison
 $currentUserId = (int)$user['userId'];
 
-// Récupérer le jeu depuis l'URL ou les paramètres GET
+// Récupérer le slug du jeu depuis l'URL
 $game = '';
-
-// Essayer d'abord depuis les paramètres GET
 if (isset($_GET['game'])) {
     $game = sanitize($_GET['game']);
 } else {
-    // Sinon depuis l'URL (pour .htaccess)
     $requestUri = $_SERVER['REQUEST_URI'];
     $pathParts = explode('/', parse_url($requestUri, PHP_URL_PATH));
     $game = sanitize(end($pathParts));
@@ -32,15 +33,16 @@ if (empty($game)) {
 try {
     $db = getDB();
 
-    // Récupérer le profil de l'utilisateur actuel pour ce jeu
+    // Récupérer le profil de l'utilisateur pour ce jeu
     $stmt = $db->prepare('
-        SELECT id, rank, mode, tolerance, preferred_ranks
+        SELECT id, rank, rank_level, mode, style, tolerance
         FROM game_profiles
         WHERE user_id = ? AND game = ?
     ');
     $stmt->execute([$currentUserId, $game]);
     $myProfile = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Si pas de profil configuré
     if (!$myProfile) {
         sendJSON([
             'success' => true,
@@ -50,132 +52,73 @@ try {
         exit;
     }
 
-    // Liste des rangs par jeu (simplifié - tous les jeux utilisent le même système)
-    $allRanks = [
-        'fer1', 'fer2', 'fer3',
-        'bronze1', 'bronze2', 'bronze3',
-        'argent1', 'argent2', 'argent3',
-        'or1', 'or2', 'or3',
-        'platine1', 'platine2', 'platine3',
-        'diamant1', 'diamant2', 'diamant3',
-        'ascendant1', 'ascendant2', 'ascendant3',
-        'immortal1', 'immortal2', 'immortal3',
-        'radiant'
-    ];
-
-    $tolerance = (int)$myProfile['tolerance'];
-    $preferredRanks = json_decode($myProfile['preferred_ranks'] ?? '[]', true);
-
-    // Si l'utilisateur a spécifié des rangs préférés, les utiliser avec tolérance
-    if (!empty($preferredRanks) && is_array($preferredRanks)) {
-        $acceptableRanks = [];
-
-        // Pour chaque rang préféré, ajouter les rangs dans la tolérance
-        foreach ($preferredRanks as $prefRank) {
-            $prefRankIndex = array_search($prefRank, $allRanks);
-            if ($prefRankIndex !== false) {
-                $minIndex = max(0, $prefRankIndex - $tolerance);
-                $maxIndex = min(count($allRanks) - 1, $prefRankIndex + $tolerance);
-
-                for ($i = $minIndex; $i <= $maxIndex; $i++) {
-                    if (!in_array($allRanks[$i], $acceptableRanks)) {
-                        $acceptableRanks[] = $allRanks[$i];
-                    }
-                }
-            }
-        }
-    } else {
-        // Utiliser le rang de l'utilisateur avec tolérance
-        $myRank = $myProfile['rank'];
-        $myRankIndex = array_search($myRank, $allRanks);
-        if ($myRankIndex === false) {
-            $myRankIndex = 0;
-        }
-
-        $minRankIndex = max(0, $myRankIndex - $tolerance);
-        $maxRankIndex = min(count($allRanks) - 1, $myRankIndex + $tolerance);
-        $acceptableRanks = array_slice($allRanks, $minRankIndex, $maxRankIndex - $minRankIndex + 1);
+    // Vérifier que rank_level est défini
+    if ($myProfile['rank_level'] === null) {
+        sendJSON([
+            'success' => false,
+            'error' => 'Votre profil nécessite une mise à jour. Veuillez reconfigurer votre rang.'
+        ], 400);
+        exit;
     }
+
+    // Extraire les paramètres de matching
+    $userRankLevel = (int)$myProfile['rank_level'];
+    $userMode = $myProfile['mode'];
+    $userStyle = $myProfile['style'];
+    $userTolerance = (int)$myProfile['tolerance'];
 
     // Log de débogage
-    error_log("DEBUG SEARCH - User ID: $currentUserId (type: " . gettype($currentUserId) . ")");
-    error_log("DEBUG SEARCH - Game: $game");
-    error_log("DEBUG SEARCH - Mon rang: $myRank, Index: $myRankIndex, Tolérance: $tolerance");
-    error_log("DEBUG SEARCH - Min index: $minRankIndex, Max index: $maxRankIndex");
-    error_log("DEBUG SEARCH - Rangs acceptables: " . implode(', ', $acceptableRanks));
+    error_log("MATCHMAKING - User: {$currentUserId}, Game: {$game}, Rank Level: {$userRankLevel}, Mode: {$userMode}, Style: {$userStyle}, Tolerance: {$userTolerance}");
 
-    // Créer les placeholders pour la requête SQL
-    $placeholders = implode(',', array_fill(0, count($acceptableRanks), '?'));
-
-    // Rechercher des profils qui correspondent à MES critères uniquement
-    // ET qui sont actuellement en ligne (actifs dans les 15 dernières minutes)
-    $stmt = $db->prepare("
+    // Recherche SQL - Matching uniquement sur rank_level (avec tolérance)
+    // Mode et style sont affichés mais ne filtrent pas
+    $sql = "
         SELECT
-            gp.id as profile_id,
-            gp.user_id,
-            gp.rank,
-            gp.mode,
-            gp.tolerance,
-            gp.style,
-            gp.options,
+            u.id as user_id,
             u.username,
-            u.email,
-            us.last_activity
+            gp.rank,
+            gp.rank_level,
+            gp.mode,
+            gp.style
         FROM game_profiles gp
-        JOIN users u ON gp.user_id = u.id
+        JOIN users u ON u.id = gp.user_id
         JOIN user_sessions us ON u.id = us.user_id
-        WHERE gp.game = ?
-        AND gp.user_id != ?
-        AND gp.rank IN ($placeholders)
-        AND u.is_banned = 0
-        AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+        WHERE gp.game = :game
+          AND ABS(gp.rank_level - :user_rank_level) <= :user_tolerance
+          AND gp.user_id != :current_user_id
+          AND u.is_banned = 0
+          AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
         ORDER BY RAND()
         LIMIT 10
-    ");
+    ";
 
-    $params = array_merge([$game, $currentUserId], $acceptableRanks);
-    error_log("DEBUG SEARCH - Params SQL: game=$game, exclude_user_id=$currentUserId, ranks=" . implode(',', $acceptableRanks));
+    $params = [
+        'game' => $game,
+        'user_rank_level' => $userRankLevel,
+        'user_tolerance' => $userTolerance,
+        'current_user_id' => $currentUserId
+    ];
+
+    $stmt = $db->prepare($sql);
     $stmt->execute($params);
+
     $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Filtrer pour être absolument sûr qu'on ne se voit pas soi-même
-    $matches = array_filter($matches, function($match) use ($currentUserId) {
-        return (int)$match['user_id'] !== $currentUserId;
-    });
-
     // Log des résultats
-    error_log("DEBUG SEARCH - Nombre de matchs trouvés: " . count($matches));
+    error_log("MATCHMAKING - Résultats trouvés: " . count($matches));
     foreach ($matches as $match) {
-        error_log("DEBUG SEARCH - Match trouvé: user_id=" . $match['user_id'] . " (type: " . gettype($match['user_id']) . "), username=" . $match['username'] . ", rang=" . $match['rank']);
+        error_log("  - User: {$match['username']}, Rank: {$match['rank']} (level {$match['rank_level']}), Mode: {$match['mode']}, Style: {$match['style']}");
     }
 
-    // Formater les résultats
+    // Formater la réponse selon la spécification
     $formattedMatches = array_map(function($match) {
-        // Parser le mode s'il contient des options (ex: "Classé (+ Vocal Obligatoire)")
-        $mode = $match['mode'] ?? 'Non défini';
-        $mainMode = $mode;
-        $modeOptions = [];
-
-        if (preg_match('/^(.+?)\s*\(\+\s*(.+)\)$/', $mode, $matches_mode)) {
-            $mainMode = trim($matches_mode[1]);
-            $modeOptions = array_map('trim', explode(',', $matches_mode[2]));
-        }
-
-        // Décoder les options (JSON array)
-        $options = json_decode($match['options'] ?? '[]', true);
-        if (!is_array($options)) {
-            $options = [];
-        }
-
         return [
-            'id' => $match['user_id'],
+            'id' => (int)$match['user_id'],
             'username' => $match['username'],
             'rank' => $match['rank'],
-            'mainMode' => $mainMode,
-            'modeOptions' => $modeOptions,
-            'style' => $match['style'],
-            'options' => $options,
-            'compatibility' => 85 + rand(0, 15) // Score de compatibilité simulé
+            'rank_level' => (int)$match['rank_level'],
+            'mode' => $match['mode'],
+            'style' => $match['style']
         ];
     }, $matches);
 
