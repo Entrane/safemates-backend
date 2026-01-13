@@ -32,25 +32,7 @@ if (empty($game)) {
 
 try {
     $db = getDB();
-
-    // AUTO-MIGRATION: Mettre à jour les rank_level manquants (migration automatique)
     require_once __DIR__ . '/../rank-mapping.php';
-
-    $stmt = $db->query('SELECT id, game, rank, rank_level FROM game_profiles WHERE rank_level IS NULL AND rank IS NOT NULL');
-    $needsUpdate = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if (count($needsUpdate) > 0) {
-        error_log("AUTO-MIGRATION: " . count($needsUpdate) . " profils sans rank_level détectés");
-
-        $updateStmt = $db->prepare('UPDATE game_profiles SET rank_level = ? WHERE id = ?');
-        foreach ($needsUpdate as $profile) {
-            $level = getRankLevel($profile['rank'], $profile['game']);
-            if ($level !== null) {
-                $updateStmt->execute([$level, $profile['id']]);
-                error_log("  - Profil #{$profile['id']}: {$profile['rank']} → {$level}");
-            }
-        }
-    }
 
     // Récupérer le profil de l'utilisateur pour ce jeu (avec préférences)
     $stmt = $db->prepare('
@@ -117,14 +99,15 @@ try {
     $rankConditions = [];
     $params = [
         'game' => $game,
-        'user_tolerance' => $userTolerance,
         'current_user_id' => $currentUserId
     ];
 
     foreach ($prefRankLevels as $index => $level) {
         $paramName = "rank_level_{$index}";
-        $rankConditions[] = "ABS(gp.rank_level - :{$paramName}) <= :user_tolerance";
+        $toleranceName = "tolerance_{$index}";
+        $rankConditions[] = "ABS(gp.rank_level - :{$paramName}) <= :{$toleranceName}";
         $params[$paramName] = $level;
+        $params[$toleranceName] = $userTolerance;
     }
 
     // Si aucune préférence valide, retourner vide
@@ -152,7 +135,8 @@ try {
             gp.rank,
             gp.rank_level,
             gp.mode,
-            gp.style
+            gp.style,
+            gp.options
         FROM game_profiles gp
         JOIN users u ON u.id = gp.user_id
         JOIN user_sessions us ON u.id = us.user_id
@@ -204,13 +188,23 @@ try {
 
     // Formater la réponse selon la spécification
     $formattedMatches = array_map(function($match) {
+        // Décoder les options pour extraire l'info vocal
+        $options = null;
+        $voiceChat = false;
+
+        if ($match['options']) {
+            $options = json_decode($match['options'], true);
+            $voiceChat = isset($options['voiceChat']) ? (bool)$options['voiceChat'] : false;
+        }
+
         return [
             'id' => (int)$match['user_id'],
             'username' => $match['username'],
             'rank' => $match['rank'],
             'rank_level' => (int)$match['rank_level'],
             'mode' => $match['mode'],
-            'style' => $match['style']
+            'style' => $match['style'],
+            'voiceChat' => $voiceChat
         ];
     }, $matches);
 
@@ -221,7 +215,12 @@ try {
     ], 200);
 
 } catch (PDOException $e) {
-    error_log("Erreur recherche matchs: " . $e->getMessage());
-    sendJSON(['error' => 'Erreur lors de la recherche de partenaires'], 500);
+    error_log("ERREUR MATCHMAKING PDO: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    sendJSON(['error' => 'Erreur lors de la recherche de partenaires', 'details' => $e->getMessage()], 500);
+} catch (Exception $e) {
+    error_log("ERREUR MATCHMAKING GENERALE: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    sendJSON(['error' => 'Erreur lors de la recherche de partenaires', 'details' => $e->getMessage()], 500);
 }
 ?>

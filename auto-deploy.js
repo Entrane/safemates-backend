@@ -27,7 +27,10 @@ const CRITICAL_FILES = [
     'database.sqlite',
     'test_match.js',
     'verify_ranks.js',
-    'fix_invalid_ranks.js'
+    'fix_invalid_ranks.js',
+    'check_schema.php',
+    'add_preference_columns.php',
+    'view_logs.php'
 ];
 
 function deployFile(file) {

@@ -1910,8 +1910,8 @@
                 // Affichage du style
                 const styleDisplay = match.style ? `<span style="color: #4caf50;">é ${match.style}</span>` : '';
 
-                // Icéne vocal
-                const hasVocal = match.options && match.options.includes('Vocal Obligatoire');
+                // Icône vocal
+                const hasVocal = match.voiceChat === true;
                 const vocalIcon = hasVocal ? '<i class="fas fa-microphone" title="Vocal obligatoire" style="color: #4caf50; margin-left: 8px;"></i>' : '';
 
                 return `
