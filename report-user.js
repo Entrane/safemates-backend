@@ -15,8 +15,8 @@
                         <input type="hidden" id="reportedUsername">
 
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Utilisateur signal&eacute;</label>
-                            <input type="text" id="reportedUsernameDisplay" readonly style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Utilisateur signalé</label>
+                            <input type="text" id="reportedUsernameDisplay" readonly style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; color: #333; font-weight: 600;">
                         </div>
 
                         <div style="margin-bottom: 20px;">
@@ -107,8 +107,8 @@
                 };
 
                 const response = await (useFetchProtected
-                    ? window.fetchProtected('/api/reports', baseOptions)
-                    : fetch('/api/reports', {
+                    ? window.fetchProtected('/api/reports.php', baseOptions)
+                    : fetch('/api/reports.php', {
                         ...baseOptions,
                         headers: {
                             'Content-Type': 'application/json',
