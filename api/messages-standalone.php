@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insérer message
         $stmt = $db->prepare("
-            INSERT INTO messages (from_user_id, to_user_id, content, created_at)
+            INSERT INTO messages (sender_id, recipient_id, message, sent_at)
             VALUES (?, ?, ?, NOW())
         ");
         $stmt->execute([$userId, $toUserId, $content]);
@@ -133,10 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Récupérer le message
         $stmt = $db->prepare("
-            SELECT m.id, m.from_user_id, m.to_user_id, m.content, m.created_at,
+            SELECT m.id, m.sender_id as from_user_id, m.recipient_id as to_user_id,
+                   m.message as content, m.sent_at as created_at,
                    u.username as from_username
             FROM messages m
-            JOIN users u ON u.id = m.from_user_id
+            JOIN users u ON u.id = m.sender_id
             WHERE m.id = ?
         ");
         $stmt->execute([$messageId]);
@@ -174,13 +175,14 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $friendId = $friend['id'];
 
         $stmt = $db->prepare("
-            SELECT m.id, m.from_user_id, m.to_user_id, m.content, m.created_at,
+            SELECT m.id, m.sender_id as from_user_id, m.recipient_id as to_user_id,
+                   m.message as content, m.sent_at as created_at,
                    u.username as from_username
             FROM messages m
-            JOIN users u ON u.id = m.from_user_id
-            WHERE (m.from_user_id = ? AND m.to_user_id = ?)
-               OR (m.from_user_id = ? AND m.to_user_id = ?)
-            ORDER BY m.created_at ASC
+            JOIN users u ON u.id = m.sender_id
+            WHERE (m.sender_id = ? AND m.recipient_id = ?)
+               OR (m.sender_id = ? AND m.recipient_id = ?)
+            ORDER BY m.sent_at ASC
         ");
         $stmt->execute([$userId, $friendId, $friendId, $userId]);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
