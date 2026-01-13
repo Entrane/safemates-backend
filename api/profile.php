@@ -76,17 +76,17 @@ try {
 
         // Validation du rank_level
         $rankLevel = (int)$data['rank_level'];
-        if (!isValidRankLevel($rankLevel)) {
-            sendJSON(['error' => 'rank_level invalide (doit être entre 1 et 25)'], 400);
+        if (!isValidRankLevel($rankLevel, $game)) {
+            sendJSON(['error' => 'rank_level invalide pour ce jeu'], 400);
         }
 
         // Validation du slug de rang
-        if (!isValidRankSlug($data['rank'])) {
-            sendJSON(['error' => 'Slug de rang invalide'], 400);
+        if (!isValidRankSlug($data['rank'], $game)) {
+            sendJSON(['error' => 'Slug de rang invalide pour ce jeu'], 400);
         }
 
         // Vérifier que le rank correspond au rank_level
-        $expectedLevel = getRankLevel($data['rank']);
+        $expectedLevel = getRankLevel($data['rank'], $game);
         if ($expectedLevel !== $rankLevel) {
             sendJSON(['error' => "Incohérence: '{$data['rank']}' devrait avoir un rank_level de {$expectedLevel}, pas {$rankLevel}"], 400);
         }
