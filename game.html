@@ -1240,28 +1240,88 @@
         let activeUsername = null;
         let activeUserId = null;
 
-        // === MATCHMAKING REFACTORISÉ: Mapping rank → rank_level ===
-        const RANK_LEVEL_MAP = {
-            'fer1': 1, 'fer2': 2, 'fer3': 3,
-            'bronze1': 4, 'bronze2': 5, 'bronze3': 6,
-            'argent1': 7, 'argent2': 8, 'argent3': 9,
-            'silver1': 7, 'silver2': 8, 'silver3': 9,
-            'or1': 10, 'or2': 11, 'or3': 12,
-            'gold': 11, 'gold1': 10, 'gold2': 11, 'gold3': 12,
-            'platine1': 13, 'platine2': 14, 'platine3': 15,
-            'platinum1': 13, 'platinum2': 14, 'platinum3': 15,
-            'diamant1': 16, 'diamant2': 17, 'diamant3': 18,
-            'diamond1': 16, 'diamond2': 17, 'diamond3': 18,
-            'ascendant1': 19, 'ascendant2': 20, 'ascendant3': 21,
-            'immortal1': 22, 'immortal2': 23, 'immortal3': 24,
-            'master': 23,
-            'radiant': 25
+        // === MATCHMAKING REFACTORISÉ: Mapping rank → rank_level (SÉPARÉ PAR JEU) ===
+        const RANK_LEVEL_MAPS = {
+            valorant: {
+                'fer1': 1, 'fer2': 2, 'fer3': 3,
+                'bronze1': 4, 'bronze2': 5, 'bronze3': 6,
+                'argent1': 7, 'argent2': 8, 'argent3': 9,
+                'or1': 10, 'or2': 11, 'or3': 12,
+                'platine1': 13, 'platine2': 14, 'platine3': 15,
+                'diamant1': 16, 'diamant2': 17, 'diamant3': 18,
+                'ascendant_1': 19, 'ascendant_2': 20, 'ascendant_3': 21,
+                'immortal_1': 22, 'immortal_2': 23, 'immortal_3': 24,
+                'radiant': 25
+            },
+            lol: {
+                'iron': 1,
+                'bronze': 2,
+                'silver': 3,
+                'gold': 4,
+                'platinum': 5,
+                'emerald': 6,
+                'diamond': 7,
+                'master': 8,
+                'grandmaster': 9,
+                'challenger': 10
+            },
+            csgo: {
+                'silver': 1,
+                'silver2': 2,
+                'silver3': 3,
+                'silver4': 4,
+                'silver5': 5,
+                'silver6': 6,
+                'gold1': 7,
+                'gold2': 8,
+                'gold3': 9,
+                'gold4': 10,
+                'mg1': 11,
+                'mg2': 12,
+                'mge': 13,
+                'dmg': 14,
+                'le': 15,
+                'lem': 16,
+                'supreme': 17,
+                'global': 18
+            },
+            rocketleague: {
+                'bronze': 1,
+                'silver': 2,
+                'gold': 3,
+                'platine': 4,
+                'diamant': 5,
+                'champion': 6,
+                'grandchampion': 7
+            },
+            fortnite: {
+                'bronze': 1,
+                'silver': 2,
+                'gold': 3,
+                'platine': 4,
+                'diamant': 5,
+                'champion': 6,
+                'elite': 7,
+                'unreal': 8
+            },
+            warzone: {
+                'bronze': 1,
+                'silver': 2,
+                'gold': 3,
+                'platine': 4,
+                'diamant': 5,
+                'crimson': 6,
+                'iridescent': 7,
+                'top250': 8
+            }
         };
 
-        function getRankLevel(rankSlug) {
+        function getRankLevel(rankSlug, gameIdParam) {
             if (!rankSlug) return null;
             const normalized = rankSlug.toLowerCase().trim();
-            return RANK_LEVEL_MAP[normalized] || null;
+            const currentGameId = gameIdParam || gameId || 'valorant';
+            const gameRanks = RANK_LEVEL_MAPS[currentGameId] || RANK_LEVEL_MAPS.valorant;
+            return gameRanks[normalized] || null;
         }
 
         // Configuration de l'API - Utiliser l'API PHP locale sur Hostinger
@@ -1675,11 +1735,11 @@
                 return;
             }
 
-            // Calculer le rank_level
-            const rankLevel = getRankLevel(userGameData.rank);
+            // Calculer le rank_level (avec gameId)
+            const rankLevel = getRankLevel(userGameData.rank, gameId);
             if (rankLevel === null) {
-                console.error('❌ Rang invalide:', userGameData.rank);
-                alert('Erreur: rang invalide');
+                console.error('❌ Rang invalide:', userGameData.rank, 'pour le jeu:', gameId);
+                alert('Erreur: rang invalide pour ce jeu');
                 return;
             }
 
