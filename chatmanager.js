@@ -204,7 +204,7 @@ class ChatManager {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            const response = await fetch(`/api/messages?with=${username}`, {
+            const response = await fetch(`/api/messages.php?with=${username}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -248,7 +248,7 @@ class ChatManager {
                 return { success: false, error: 'Non authentifié' };
             }
             
-            const response = await fetch('/api/messages', {
+            const response = await fetch('/api/messages.php', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
