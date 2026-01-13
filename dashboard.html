@@ -961,6 +961,89 @@
         transform: translateY(0) scale(0.98);
     }
 
+    /* Menu trois points pour les amis */
+    .friend-menu-container {
+        position: relative;
+    }
+
+    .friend-menu-btn {
+        min-width: 32px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .friend-menu-btn:hover {
+        background: rgba(156, 163, 175, 0.1);
+        color: #fff;
+    }
+
+    .friend-menu-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--bg-dark);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        min-width: 180px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        margin-top: 4px;
+        overflow: hidden;
+    }
+
+    .friend-menu-dropdown.show {
+        display: flex;
+    }
+
+    .friend-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+        font-size: 0.9rem;
+    }
+
+    .friend-menu-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .friend-menu-item.report-friend-btn {
+        color: #ffa726;
+    }
+
+    .friend-menu-item.report-friend-btn:hover {
+        background: rgba(255, 167, 38, 0.1);
+    }
+
+    .friend-menu-item.remove-friend-btn {
+        color: #ef4444;
+    }
+
+    .friend-menu-item.remove-friend-btn:hover {
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .friend-menu-item i {
+        width: 16px;
+    }
+
     /* STYLES DES BULLES DE CHAT */
     .msg {
         max-width: 70%;
@@ -1839,12 +1922,21 @@ function renderFriends(list) {
                 <span>${f.username}</span>
             </div>
             ${unreadCount > 0 ? `<span class="friend-card-badge" id="badge-${f.username}">${unreadCount}</span>` : ''}
-            <button type="button" class="report-friend-btn" data-username="${f.username}" style="min-width:32px; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; background: transparent; border: 1px solid #ffa726; color: #ffa726; border-radius: 50%; cursor: pointer; transition: all 0.2s; margin-right: 5px;" title="Signaler cet utilisateur">
-                <i class="fas fa-exclamation-triangle"></i>
-            </button>
-            <button type="button" class="action-btn reject remove-friend-btn" data-username="${f.username}" style="min-width:32px; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; background: transparent; border: 1px solid #ef4444; color: #ef4444; border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Supprimer cet ami">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="friend-menu-container">
+                <button type="button" class="friend-menu-btn" data-username="${f.username}">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="friend-menu-dropdown">
+                    <button class="friend-menu-item report-friend-btn" data-username="${f.username}">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Signaler</span>
+                    </button>
+                    <button class="friend-menu-item remove-friend-btn" data-username="${f.username}">
+                        <i class="fas fa-trash"></i>
+                        <span>Supprimer l'ami</span>
+                    </button>
+                </div>
+            </div>
         `;
 
         // Ajouter le gestionnaire de clic pour ouvrir le chat sur le contenu de la carte
@@ -1853,6 +1945,24 @@ function renderFriends(list) {
             contentDiv.addEventListener('click', () => {
                 console.log('Ouverture du chat avec:', f.username);
                 openChat(f.username);
+            });
+        }
+
+        // Ajouter le gestionnaire pour le menu trois points
+        const menuBtn = d.querySelector('.friend-menu-btn');
+        const menuDropdown = d.querySelector('.friend-menu-dropdown');
+        if (menuBtn && menuDropdown) {
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                // Fermer tous les autres menus ouverts
+                document.querySelectorAll('.friend-menu-dropdown.show').forEach(dropdown => {
+                    if (dropdown !== menuDropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+                // Toggle le menu actuel
+                menuDropdown.classList.toggle('show');
             });
         }
 
@@ -2328,6 +2438,15 @@ INITIALISATION FINALE
     updateUserProfileDisplay();
     startNotificationPolling();
     startHeartbeat();
+
+    // Fermer le menu ami quand on clique en dehors
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.friend-menu-container')) {
+            document.querySelectorAll('.friend-menu-dropdown.show').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
 })();
 </script>
 

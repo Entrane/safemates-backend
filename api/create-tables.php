@@ -112,6 +112,24 @@ try {
     ");
     echo "✅ Table 'game_profiles' créée\n\n";
 
+    // Table messages
+    echo "Création de la table 'messages'...\n";
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            from_user_id INT NOT NULL,
+            to_user_id INT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_from_to (from_user_id, to_user_id),
+            INDEX idx_to_from (to_user_id, from_user_id),
+            INDEX idx_created (created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    echo "✅ Table 'messages' créée\n\n";
+
     echo str_repeat("=", 50) . "\n";
     echo "🎉 TOUTES LES TABLES ONT ÉTÉ CRÉÉES AVEC SUCCÈS !\n";
     echo str_repeat("=", 50) . "\n\n";
