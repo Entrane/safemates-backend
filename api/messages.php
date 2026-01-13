@@ -4,19 +4,10 @@
  * Gestion des messages entre amis
  */
 
-// Debug
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once __DIR__ . '/config.php';
 
-try {
-    $authUser = requireAuth();
-    $userId = $authUser['userId'];
-} catch (Exception $e) {
-    error_log("Erreur requireAuth: " . $e->getMessage());
-    sendJSON(['error' => 'Erreur authentification: ' . $e->getMessage()], 500);
-}
+$authUser = requireAuth();
+$userId = $authUser['userId'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Envoyer un message
