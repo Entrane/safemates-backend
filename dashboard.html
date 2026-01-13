@@ -1943,21 +1943,9 @@ function renderFriends(list) {
                 <span>${f.username}</span>
             </div>
             ${unreadCount > 0 ? `<span class="friend-card-badge" id="badge-${f.username}">${unreadCount}</span>` : ''}
-            <div class="friend-menu-container">
-                <button type="button" class="friend-menu-btn" data-username="${f.username}" style="position: relative; z-index: 100;">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-                <div class="friend-menu-dropdown" style="background: red !important; border: 3px solid yellow !important;">
-                    <button class="friend-menu-item report-friend-btn" data-username="${f.username}">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Signaler</span>
-                    </button>
-                    <button class="friend-menu-item remove-friend-btn" data-username="${f.username}">
-                        <i class="fas fa-trash"></i>
-                        <span>Supprimer l'ami</span>
-                    </button>
-                </div>
-            </div>
+            <button type="button" class="friend-menu-btn" data-username="${f.username}" onclick="window.toggleFriendMenu(event, '${f.username}')" style="position: relative; z-index: 100;">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
         `;
 
         // Ajouter le gestionnaire de clic pour ouvrir le chat sur le contenu de la carte
@@ -1969,43 +1957,7 @@ function renderFriends(list) {
             });
         }
 
-        // Ajouter le gestionnaire pour le menu trois points
-        const menuBtn = d.querySelector('.friend-menu-btn');
-        const menuDropdown = d.querySelector('.friend-menu-dropdown');
-        if (menuBtn && menuDropdown) {
-            menuBtn.addEventListener('click', function(e) {
-                console.log('Click sur 3 points détecté!');
-                e.stopPropagation();
-                e.preventDefault();
-
-                try {
-                    // Fermer tous les autres menus
-                    const allMenus = document.querySelectorAll('.friend-menu-dropdown.show');
-                    allMenus.forEach(function(dropdown) {
-                        if (dropdown !== menuDropdown) {
-                            dropdown.classList.remove('show');
-                        }
-                    });
-
-                    // Toggle le menu actuel
-                    const isShowing = menuDropdown.classList.toggle('show');
-                    console.log('Menu show:', isShowing);
-
-                    // Positionner le menu
-                    if (isShowing) {
-                        const rect = menuBtn.getBoundingClientRect();
-                        const menuWidth = 180;
-                        menuDropdown.style.top = rect.bottom + 4 + 'px';
-                        menuDropdown.style.left = rect.right - menuWidth + 'px'; // Aligné à droite du bouton
-                        console.log('Menu positionné à:', rect.bottom + 4, rect.right - menuWidth);
-                    }
-                } catch (error) {
-                    console.error('Erreur menu:', error);
-                }
-            });
-        } else {
-            console.warn('Menu btn ou dropdown non trouvé');
-        }
+        // Le menu est géré par window.toggleFriendMenu maintenant
 
         // Ajouter le gestionnaire pour le bouton de signalement
         const reportBtn = d.querySelector('.report-friend-btn');
@@ -2480,12 +2432,85 @@ INITIALISATION FINALE
     startNotificationPolling();
     startHeartbeat();
 
-    // Fermer le menu ami quand on clique en dehors
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.friend-menu-container')) {
-            document.querySelectorAll('.friend-menu-dropdown.show').forEach(dropdown => {
-                dropdown.classList.remove('show');
+    // Fonction globale pour gérer le menu ami
+    window.toggleFriendMenu = function(e, username) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        console.log('Toggle menu pour:', username);
+
+        // Supprimer l'ancien menu s'il existe
+        const oldMenu = document.getElementById('friend-menu-global');
+        if (oldMenu) {
+            oldMenu.remove();
+        }
+
+        // Créer le nouveau menu
+        const menu = document.createElement('div');
+        menu.id = 'friend-menu-global';
+        menu.className = 'friend-menu-dropdown show';
+        menu.innerHTML = `
+            <button class="friend-menu-item" onclick="window.reportFriend('${username}')">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Signaler</span>
+            </button>
+            <button class="friend-menu-item" onclick="window.removeFriendConfirm('${username}')">
+                <i class="fas fa-trash"></i>
+                <span>Supprimer l'ami</span>
+            </button>
+        `;
+
+        // Positionner le menu
+        const rect = e.target.closest('button').getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.top = rect.bottom + 4 + 'px';
+        menu.style.right = window.innerWidth - rect.right + 'px';
+        menu.style.zIndex = '99999';
+
+        document.body.appendChild(menu);
+        console.log('Menu créé et ajouté au body');
+    };
+
+    window.reportFriend = function(username) {
+        document.getElementById('friend-menu-global')?.remove();
+        if (typeof window.openReportModal === 'function') {
+            window.openReportModal(username);
+        } else {
+            alert('Module de signalement indisponible');
+        }
+    };
+
+    window.removeFriendConfirm = async function(username) {
+        document.getElementById('friend-menu-global')?.remove();
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer ${username} de vos amis ?`)) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/friends.php', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username })
             });
+
+            if (response.ok) {
+                alert('Ami supprimé avec succès');
+                loadSocial();
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur réseau');
+        }
+    };
+
+    // Fermer le menu quand on clique ailleurs
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.friend-menu-btn') && !e.target.closest('#friend-menu-global')) {
+            document.getElementById('friend-menu-global')?.remove();
         }
     });
 })();
