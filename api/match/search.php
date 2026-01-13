@@ -71,29 +71,84 @@ try {
         exit;
     }
 
-    // Vérifier que rank_level est défini
-    if ($myProfile['rank_level'] === null) {
-        sendJSON([
-            'success' => false,
-            'error' => 'Votre profil nécessite une mise à jour. Veuillez reconfigurer votre rang.'
-        ], 400);
-        exit;
-    }
+    // Récupérer les préférences du partenaire
+    $stmt = $db->prepare('SELECT prefRanks, rankTolerance FROM partner_preferences WHERE user_id = ?');
+    $stmt->execute([$currentUserId]);
+    $preferences = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Extraire les paramètres de matching
-    $userRankLevel = (int)$myProfile['rank_level'];
-    $userMode = $myProfile['mode'];
-    $userStyle = $myProfile['style'];
-    $userTolerance = (int)$myProfile['tolerance'];
+    $userTolerance = 1; // Par défaut
+    $prefRanks = [];
+
+    if ($preferences) {
+        $userTolerance = (int)($preferences['rankTolerance'] ?? 1);
+        $prefRanksJson = $preferences['prefRanks'];
+        if ($prefRanksJson) {
+            $prefRanks = json_decode($prefRanksJson, true) ?? [];
+        }
+    }
+
+    // Si aucune préférence de rang n'est définie, utiliser le rang du profil
+    if (empty($prefRanks)) {
+        if ($myProfile['rank_level'] === null) {
+            sendJSON([
+                'success' => false,
+                'error' => 'Veuillez définir vos préférences de rang ou configurer votre rang.'
+            ], 400);
+            exit;
+        }
+        $prefRanks = [$myProfile['rank']];
+    }
+
+    // Convertir les slugs de rangs préférés en rank_levels
+    $prefRankLevels = [];
+    foreach ($prefRanks as $rankSlug) {
+        $level = getRankLevel($rankSlug, $game);
+        if ($level !== null) {
+            $prefRankLevels[] = $level;
+        }
+    }
 
     // Log de débogage détaillé
     error_log("MATCHMAKING - User: {$currentUserId}, Game: {$game}");
-    error_log("  User Rank: {$myProfile['rank']} (level: {$userRankLevel})");
+    error_log("  Preferred Ranks: " . implode(', ', $prefRanks) . " (levels: " . implode(', ', $prefRankLevels) . ")");
     error_log("  Tolerance: {$userTolerance}");
-    error_log("  Range acceptée: " . ($userRankLevel - $userTolerance) . " à " . ($userRankLevel + $userTolerance));
 
-    // Recherche SQL - Matching uniquement sur rank_level (avec tolérance)
-    // Mode et style sont affichés mais ne filtrent pas
+    // Calculer toutes les plages acceptées
+    $ranges = [];
+    foreach ($prefRankLevels as $level) {
+        $ranges[] = ($level - $userTolerance) . "-" . ($level + $userTolerance);
+    }
+    error_log("  Ranges acceptées: " . implode(', ', $ranges));
+
+    // Construire les conditions SQL pour chaque rang préféré
+    $rankConditions = [];
+    $params = [
+        'game' => $game,
+        'user_tolerance' => $userTolerance,
+        'current_user_id' => $currentUserId
+    ];
+
+    foreach ($prefRankLevels as $index => $level) {
+        $paramName = "rank_level_{$index}";
+        $rankConditions[] = "ABS(gp.rank_level - :{$paramName}) <= :user_tolerance";
+        $params[$paramName] = $level;
+    }
+
+    // Si aucune préférence valide, retourner vide
+    if (empty($rankConditions)) {
+        sendJSON([
+            'success' => true,
+            'matches' => [],
+            'message' => 'Aucune préférence de rang valide'
+        ], 200);
+        exit;
+    }
+
+    // Joindre les conditions avec OR
+    $rankConditionSQL = '(' . implode(' OR ', $rankConditions) . ')';
+
+    // Recherche SQL - Matching sur rank_level avec préférences multiples
     $sql = "
         SELECT
             u.id as user_id,
@@ -107,20 +162,13 @@ try {
         JOIN user_sessions us ON u.id = us.user_id
         WHERE gp.game = :game
           AND gp.rank_level IS NOT NULL
-          AND ABS(gp.rank_level - :user_rank_level) <= :user_tolerance
+          AND {$rankConditionSQL}
           AND gp.user_id != :current_user_id
           AND u.is_banned = 0
           AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
         ORDER BY RAND()
         LIMIT 10
     ";
-
-    $params = [
-        'game' => $game,
-        'user_rank_level' => $userRankLevel,
-        'user_tolerance' => $userTolerance,
-        'current_user_id' => $currentUserId
-    ];
 
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
@@ -130,9 +178,22 @@ try {
     // Log des résultats avec calcul de différence
     error_log("MATCHMAKING - Résultats trouvés: " . count($matches));
     foreach ($matches as $match) {
-        $diff = abs($match['rank_level'] - $userRankLevel);
-        $inRange = ($diff <= $userTolerance) ? 'OK' : 'HORS PLAGE!';
-        error_log("  - User: {$match['username']}, Rank: {$match['rank']} (level {$match['rank_level']}), Diff: {$diff}, Status: {$inRange}");
+        // Vérifier quelle préférence correspond
+        $matchedPref = null;
+        foreach ($prefRankLevels as $prefLevel) {
+            $diff = abs($match['rank_level'] - $prefLevel);
+            if ($diff <= $userTolerance) {
+                $matchedPref = $prefLevel;
+                $matchedDiff = $diff;
+                break;
+            }
+        }
+
+        if ($matchedPref !== null) {
+            error_log("  - User: {$match['username']}, Rank: {$match['rank']} (level {$match['rank_level']}), Matched pref: {$matchedPref}, Diff: {$matchedDiff}");
+        } else {
+            error_log("  - User: {$match['username']}, Rank: {$match['rank']} (level {$match['rank_level']}), NO MATCH (bug?)");
+        }
     }
 
     // Formater la réponse selon la spécification
