@@ -52,9 +52,9 @@ try {
         }
     }
 
-    // Récupérer le profil de l'utilisateur pour ce jeu
+    // Récupérer le profil de l'utilisateur pour ce jeu (avec préférences)
     $stmt = $db->prepare('
-        SELECT id, rank, rank_level, mode, style, tolerance
+        SELECT id, rank, rank_level, mode, style, tolerance, preferred_ranks
         FROM game_profiles
         WHERE user_id = ? AND game = ?
     ');
@@ -71,21 +71,13 @@ try {
         exit;
     }
 
-    // Récupérer les préférences du partenaire
-    $stmt = $db->prepare('SELECT prefRanks, rankTolerance FROM partner_preferences WHERE user_id = ?');
-    $stmt->execute([$currentUserId]);
-    $preferences = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Extraire les paramètres de matching
-    $userTolerance = 1; // Par défaut
+    // Extraire les paramètres de matching depuis le profil
+    $userTolerance = (int)($myProfile['tolerance'] ?? 1);
     $prefRanks = [];
 
-    if ($preferences) {
-        $userTolerance = (int)($preferences['rankTolerance'] ?? 1);
-        $prefRanksJson = $preferences['prefRanks'];
-        if ($prefRanksJson) {
-            $prefRanks = json_decode($prefRanksJson, true) ?? [];
-        }
+    // Lire les preferred_ranks depuis game_profiles
+    if ($myProfile['preferred_ranks']) {
+        $prefRanks = json_decode($myProfile['preferred_ranks'], true) ?? [];
     }
 
     // Si aucune préférence de rang n'est définie, utiliser le rang du profil

@@ -22,6 +22,7 @@ const CRITICAL_FILES = [
     'game.html',
     'api/rank-mapping.php',
     'api/game/settings.php',
+    'api/game/preferences.php',
     'api/match/search.php',
     'database.sqlite',
     'test_match.js',
