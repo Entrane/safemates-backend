@@ -178,16 +178,39 @@ class ChatManager {
     // Démarrer le polling global
     startGlobalPolling() {
         if (this.pollingInterval) return;
-        
-        // Polling toutes les 3 secondes pour tous les chats actifs
+
+        // Polling toutes les 5 secondes pour TOUS les amis (pas seulement chats actifs)
         this.pollingInterval = setInterval(() => {
-            const activeUsernames = Object.keys(this.activeChats);
-            if (activeUsernames.length > 0) {
-                activeUsernames.forEach(username => {
-                    this.fetchMessagesForUser(username);
-                });
+            this.fetchAllFriendsMessages();
+        }, 5000);
+    }
+
+    // Récupérer les messages de tous les amis
+    async fetchAllFriendsMessages() {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            // Récupérer la liste des amis
+            const response = await fetch('/api/friends.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const friends = data.friends || [];
+
+                // Pour chaque ami, récupérer les messages
+                for (const friend of friends) {
+                    await this.fetchMessagesForUser(friend.username);
+                }
             }
-        }, 3000);
+        } catch (error) {
+            console.error('Erreur fetchAllFriendsMessages:', error);
+        }
     }
     
     // Arrêter le polling
