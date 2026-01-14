@@ -967,6 +967,199 @@
         transform: scale(1.2);
     }
 
+    /* Modale guide du jeu */
+    .game-guide-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .game-guide-modal.active {
+        display: flex;
+    }
+
+    .game-guide-content {
+        background: linear-gradient(180deg, #1e2230 0%, #181b28 100%);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        animation: slideUp 0.4s ease;
+        position: relative;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .game-guide-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .game-guide-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+
+    .game-guide-title {
+        flex: 1;
+    }
+
+    .game-guide-title h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #22c55e;
+        font-weight: 700;
+    }
+
+    .game-guide-title p {
+        margin: 5px 0 0;
+        color: #9ca3af;
+        font-size: 0.9rem;
+    }
+
+    .game-guide-close {
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        font-size: 1.5rem;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+    .game-guide-close:hover {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
+    .game-guide-steps {
+        margin-bottom: 30px;
+    }
+
+    .guide-step {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        border-left: 3px solid #22c55e;
+    }
+
+    .guide-step-number {
+        display: inline-block;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 28px;
+        font-weight: 700;
+        margin-right: 12px;
+        font-size: 0.9rem;
+    }
+
+    .guide-step h3 {
+        display: inline;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .guide-step-content {
+        margin-top: 12px;
+        margin-left: 40px;
+        color: #d1d5db;
+        line-height: 1.6;
+    }
+
+    .guide-step-content ul {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+
+    .guide-step-content li {
+        margin: 6px 0;
+        color: #9ca3af;
+    }
+
+    .game-guide-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    .guide-btn {
+        flex: 1;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .guide-btn-primary {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+
+    .guide-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    }
+
+    .guide-btn-secondary {
+        background: rgba(156, 163, 175, 0.1);
+        color: #9ca3af;
+        border: 1px solid rgba(156, 163, 175, 0.2);
+    }
+
+    .guide-btn-secondary:hover {
+        background: rgba(156, 163, 175, 0.15);
+        color: white;
+    }
+
     /* Style pour le bouton de suppression d'ami */
     .remove-friend-btn:hover {
         background: #ef4444 !important;
@@ -1389,6 +1582,70 @@
   </script>
 </head>
 <body class="dashboard-page">
+  <!-- Modale guide du jeu -->
+  <div class="game-guide-modal" id="gameGuideModal" onclick="if(event.target===this) closeGameGuide()">
+    <div class="game-guide-content" onclick="event.stopPropagation()">
+      <div class="game-guide-header">
+        <img src="" alt="" class="game-guide-icon" id="guideGameIcon">
+        <div class="game-guide-title">
+          <h2 id="guideGameTitle">Trouver des coéquipiers</h2>
+          <p>Guide de matchmaking</p>
+        </div>
+        <button class="game-guide-close" onclick="closeGameGuide()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="game-guide-steps">
+        <div class="guide-step">
+          <span class="guide-step-number">1</span>
+          <h3>Remplissez votre profil de joueur</h3>
+          <div class="guide-step-content">
+            <p>Pour trouver les meilleurs coéquipiers, commencez par configurer votre profil :</p>
+            <ul>
+              <li><strong>Grade actuel</strong> : Indiquez votre rang dans le jeu</li>
+              <li><strong>Modes de jeu</strong> : Sélectionnez vos modes préférés (Ranked, Casual, etc.)</li>
+              <li><strong>Communication</strong> : Précisez si vous souhaitez jouer en vocal</li>
+              <li><strong>Style de jeu</strong> : Êtes-vous plutôt chill ou tryhard?</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <span class="guide-step-number">2</span>
+          <h3>Publiez votre profil</h3>
+          <div class="guide-step-content">
+            <p>Une fois vos informations remplies, cliquez sur <strong>"Publier mon profil"</strong> pour apparaître dans la base de données des joueurs disponibles.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <span class="guide-step-number">3</span>
+          <h3>Recherchez des partenaires</h3>
+          <div class="guide-step-content">
+            <p>Utilisez les filtres de recherche pour trouver des coéquipiers compatibles :</p>
+            <ul>
+              <li><strong>Rang minimum/maximum</strong> : Définissez la plage de grades acceptés</li>
+              <li><strong>Tolérance de rang</strong> : Ajustez la flexibilité sur les niveaux</li>
+              <li><strong>Mode de jeu</strong> : Filtrez par mode souhaité</li>
+              <li><strong>Communication</strong> : Trouvez des joueurs avec/sans vocal</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-guide-actions">
+        <button class="guide-btn guide-btn-secondary" onclick="closeGameGuide()">
+          Plus tard
+        </button>
+        <button class="guide-btn guide-btn-primary" onclick="startGameProfile()">
+          <i class="fas fa-rocket"></i>
+          Commencer
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Arrière-plan animé -->
   <div class="animated-background"></div>
   <div class="grain-overlay"></div>
@@ -2494,6 +2751,64 @@ document.addEventListener('click', (e) => {
             picker.style.display = 'none';
         });
     }
+});
+
+// Gestion de la modale guide du jeu
+let currentGame = null;
+
+window.openGameGuide = (gameName, gameImage) => {
+    currentGame = gameName;
+    const modal = document.getElementById('gameGuideModal');
+    const title = document.getElementById('guideGameTitle');
+    const icon = document.getElementById('guideGameIcon');
+
+    if (title) title.textContent = gameName;
+    if (icon) {
+        icon.src = gameImage || `Image/Image_jeux/${gameName.toLowerCase()}.jpg`;
+        icon.alt = gameName;
+    }
+
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+};
+
+window.closeGameGuide = () => {
+    const modal = document.getElementById('gameGuideModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+};
+
+window.startGameProfile = () => {
+    if (currentGame) {
+        // Rediriger vers la page du jeu
+        window.location.href = `game.html?game=${currentGame.toLowerCase()}`;
+    }
+    closeGameGuide();
+};
+
+// Intercepter les clics sur les cartes de jeux
+document.addEventListener('DOMContentLoaded', () => {
+    // Attendre un peu pour que les cartes soient chargées dynamiquement
+    setTimeout(() => {
+        const gameCards = document.querySelectorAll('.game-card');
+        gameCards.forEach(card => {
+            const link = card.querySelector('a');
+            if (link) {
+                const gameName = link.querySelector('.game-title')?.textContent || 'Jeu';
+                const gameImg = link.querySelector('img')?.src || '';
+
+                // Empêcher la navigation directe
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openGameGuide(gameName, gameImg);
+                });
+            }
+        });
+    }, 500);
 });
 
 window.sendMessage = async (e, username) => {
