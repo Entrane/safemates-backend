@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Version: 2026-01-14-DISCORD-UPDATE -->
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7J6VTB5BZ"></script>
 <script>
@@ -1784,19 +1785,19 @@
         <div class="game-card"><a href="game.html?game=warzone"><img src="Image/Image_jeux/warzone.avif" alt="Call of Duty: Warzone" class="game-img"><div class="game-overlay"><div class="game-title">Call of Duty: Warzone</div></div></a></div>
       </div>
 
-      <!-- Section Discord -->
-      <div class="discord-section">
-        <div class="discord-icon">
-          <i class="fab fa-discord"></i>
-        </div>
-        <div class="discord-content">
-          <p class="discord-text">Rejoins notre Discord pour échanger avec tes nouveaux teammates !</p>
-          <a href="https://discord.gg/5v9jPQEX" target="_blank" class="discord-link">
-            <i class="fab fa-discord"></i> Rejoindre le Discord
-          </a>
-        </div>
-      </div>
+    </div>
 
+    <!-- Section Discord -->
+    <div class="discord-section">
+      <div class="discord-icon">
+        <i class="fab fa-discord"></i>
+      </div>
+      <div class="discord-content">
+        <p class="discord-text">Rejoins notre Discord pour échanger avec tes nouveaux teammates !</p>
+        <a href="https://discord.gg/5v9jPQEX" target="_blank" class="discord-link">
+          <i class="fab fa-discord"></i> Rejoindre le Discord
+        </a>
+      </div>
     </div>
 
   </div>
@@ -2198,12 +2199,40 @@ function renderLibrary(list) {
         return;
     }
 
-    games.forEach(g => { 
-        const d = document.createElement('div'); 
-        d.className = 'game-card'; 
-        d.innerHTML = createCardHTML(g); 
-        libraryGrid.appendChild(d); 
-    }); 
+    games.forEach(g => {
+        const d = document.createElement('div');
+        d.className = 'game-card';
+        d.innerHTML = createCardHTML(g);
+        libraryGrid.appendChild(d);
+    });
+
+    // Ajouter la section Discord après les jeux
+    addDiscordSection();
+}
+
+// Fonction pour ajouter la section Discord
+function addDiscordSection() {
+    // Vérifier si la section existe déjà
+    if (document.getElementById('discord-section-dynamic')) return;
+
+    const librarySection = document.querySelector('.library-section');
+    if (!librarySection) return;
+
+    const discordHTML = `
+        <div class="discord-section" id="discord-section-dynamic">
+            <div class="discord-icon">
+                <i class="fab fa-discord"></i>
+            </div>
+            <div class="discord-content">
+                <p class="discord-text">Rejoins notre Discord pour échanger avec tes nouveaux teammates !</p>
+                <a href="https://discord.gg/5v9jPQEX" target="_blank" class="discord-link">
+                    <i class="fab fa-discord"></i> Rejoindre le Discord
+                </a>
+            </div>
+        </div>
+    `;
+
+    librarySection.insertAdjacentHTML('afterend', discordHTML);
 }
 
 function setupSideNavToggles() {
