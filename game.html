@@ -1169,7 +1169,7 @@
             <p style="text-align:center; color:var(--text-muted); font-size:0.9rem;">Ajoutez des amis !</p>
         </div>
 
-        <div class="sidebar-section-title" id="receivedRequestsTitle" style="display:none;">Demandes reéues (<span id="receivedCount">0</span>)</div>
+        <div class="sidebar-section-title" id="receivedRequestsTitle" style="display:none;">Demandes reçues (<span id="receivedCount">0</span>)</div>
         <div id="requestsList">
             </div>
         
@@ -2122,7 +2122,7 @@ function updateFriendsNotificationBadge() {
     const badge = document.getElementById('friendsNotificationBadge');
     if (!badge) return;
 
-    // Compter les demandes d'amis reéues
+    // Compter les demandes d'amis reçues
     const receivedCount = parseInt(document.getElementById('receivedCount')?.textContent || '0');
 
     // Compter les messages non lus
@@ -2278,7 +2278,7 @@ if (requestsListEl) {
         if (!btn) return;
         const username = btn.dataset.username;
         const action = btn.dataset.action;
-        hReq(e, username, action);
+        hReq(username, action, e);
     });
 }
 
@@ -2369,12 +2369,12 @@ if (addFriendForm) {
 }
 
 // CORRIGé: Gére l'acceptation/rejet d'une demande d'ami entrante (utilise le username du sender)
-window.hReq = async(event, username, action) => { 
-    if (event && typeof event.stopPropagation === 'function') {
-        event.stopPropagation();
-        event.preventDefault();
+window.hReq = async(username, action, evt) => {
+    if (evt && typeof evt.stopPropagation === 'function') {
+        evt.stopPropagation();
+        evt.preventDefault();
     }
-    const btn = event?.currentTarget || event?.target?.closest?.('.request-action-btn');
+    const btn = evt?.currentTarget || evt?.target?.closest?.('.request-action-btn');
     if (btn) btn.disabled = true;
     const card = btn?.closest?.('.friend-card');
     if (card) card.classList.add('processing');
