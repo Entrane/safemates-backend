@@ -1,7 +1,0 @@
-Version: 299e642
-Date: 2026-01-11 21:13:00
-Derniers changements:
-- Titre "Jeux" au lieu de "Bibliothèque de jeux"
-- Bouton "Concept" supprimé
-- Username "undefined" corrigé
-- Cache busting automatique activé
