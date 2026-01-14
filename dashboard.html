@@ -889,6 +889,62 @@
         box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
     }
 
+    /* Bouton emoji */
+    .emoji-btn {
+        background: transparent !important;
+        color: #9ca3af !important;
+        border: none !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 8px !important;
+        cursor: pointer;
+        font-size: 1.2rem !important;
+        transition: all 0.2s !important;
+        box-shadow: none !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .emoji-btn:hover {
+        background: rgba(156, 163, 175, 0.1) !important;
+        color: #22c55e !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Sélecteur d'emoji */
+    .emoji-picker {
+        position: absolute;
+        bottom: 60px;
+        left: 10px;
+        background: #1a1d2e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px;
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 8px;
+        max-width: 320px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        z-index: 1000;
+    }
+
+    .emoji-picker span {
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        text-align: center;
+        user-select: none;
+    }
+
+    .emoji-picker span:hover {
+        background: rgba(34, 197, 94, 0.2);
+        transform: scale(1.2);
+    }
+
     /* Style pour le bouton de suppression d'ami */
     .remove-friend-btn:hover {
         background: #ef4444 !important;
@@ -2312,9 +2368,13 @@ window.openChat = (username) => {
         </div>
         <div class="chat-body" id="msg-${username}"></div>
         <form class="chat-input-area" data-username="${username}">
+            <button type="button" class="emoji-btn" onclick="toggleEmojiPicker('${username}')">
+                <i class="far fa-smile"></i>
+            </button>
             <input type="text" placeholder="Écrire un message..." autocomplete="off">
             <button type="submit"><i class="fas fa-paper-plane"></i></button>
         </form>
+        <div class="emoji-picker" id="emoji-picker-${username}" style="display: none;"></div>
     `;
     
     if (chatContainer) {
@@ -2355,20 +2415,64 @@ window.openChat = (username) => {
     }
 };
 
-window.closeChat = (username) => { 
-    const el = document.getElementById(`cw-${username}`); 
+window.closeChat = (username) => {
+    const el = document.getElementById(`cw-${username}`);
     if(el) el.remove();
-    
+
     window.ChatManager.unregisterActiveChat(username);
-    
+
     const callback = activeChats[username + '_callback'];
     if (callback) {
         window.ChatManager.unsubscribe(callback);
         delete activeChats[username + '_callback'];
     }
-    
+
     delete activeChats[username];
 };
+
+// Gestion des emojis
+const emojis = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','☹️','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','👍','👎','👌','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','✋','🤚','🖐️','🖖','👋','🤝','💪','🙏','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','🔥','✨','💫','⭐','🌟','💯','🎉','🎊','🎈','🎁','🏆','🥇','🥈','🥉'];
+
+window.toggleEmojiPicker = (username) => {
+    const picker = document.getElementById(`emoji-picker-${username}`);
+    if (!picker) return;
+
+    if (picker.style.display === 'none' || picker.style.display === '') {
+        // Remplir le sélecteur si vide
+        if (picker.innerHTML === '') {
+            picker.innerHTML = emojis.map(emoji =>
+                `<span onclick="insertEmoji('${username}', '${emoji}')">${emoji}</span>`
+            ).join('');
+        }
+        picker.style.display = 'grid';
+    } else {
+        picker.style.display = 'none';
+    }
+};
+
+window.insertEmoji = (username, emoji) => {
+    const chatWindow = document.getElementById(`cw-${username}`);
+    if (!chatWindow) return;
+
+    const input = chatWindow.querySelector('input[type="text"]');
+    if (!input) return;
+
+    input.value += emoji;
+    input.focus();
+
+    // Fermer le sélecteur
+    const picker = document.getElementById(`emoji-picker-${username}`);
+    if (picker) picker.style.display = 'none';
+};
+
+// Fermer le sélecteur d'emoji en cliquant ailleurs
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.emoji-btn') && !e.target.closest('.emoji-picker')) {
+        document.querySelectorAll('.emoji-picker').forEach(picker => {
+            picker.style.display = 'none';
+        });
+    }
+});
 
 window.sendMessage = async (e, username) => {
     e.preventDefault();
