@@ -3004,6 +3004,12 @@ window.sendMessage = async (e, username) => {
             });
         }
 
+        // Écouter l'événement global de mise à jour des messages
+        window.addEventListener('chatMessagesUpdated', () => {
+            console.log('✉️ Nouveaux messages détectés - mise à jour badges');
+            updateFriendsNotificationBadge();
+        });
+
     </script>
 
     <!-- Systéme de signalement d'utilisateur -->

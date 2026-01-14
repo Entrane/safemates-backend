@@ -2531,6 +2531,12 @@ INITIALISATION FINALE
             document.getElementById('friend-menu-global')?.remove();
         }
     });
+
+    // Écouter l'événement global de mise à jour des messages
+    window.addEventListener('chatMessagesUpdated', () => {
+        console.log('✉️ Nouveaux messages détectés - mise à jour badges');
+        updateFriendsNotificationBadge();
+    });
 })();
 </script>
 

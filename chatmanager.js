@@ -147,6 +147,8 @@ class ChatManager {
         if (hasNewMessages) {
             this.saveToLocalStorage();
             this.notifySubscribers();
+            // Émettre un événement global pour notifier les badges
+            window.dispatchEvent(new CustomEvent('chatMessagesUpdated'));
         }
     }
     
