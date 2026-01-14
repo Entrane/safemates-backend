@@ -4,21 +4,45 @@
  * MatchMates - Version PHP pour Hostinger
  */
 
+// Charger les variables d'environnement depuis .env
+function loadEnv($file = __DIR__ . '/../.env') {
+    if (!file_exists($file)) {
+        die('Erreur: Fichier .env introuvable. Copiez .env.example en .env et configurez-le.');
+    }
+    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        if (!array_key_exists($key, $_ENV)) {
+            putenv("$key=$value");
+            $_ENV[$key] = $value;
+        }
+    }
+}
+
+loadEnv();
+
 // Configuration de la base de données
-// Hostinger utilise MySQL par défaut
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u639530603_SafeMates');
-define('DB_USER', 'u639530603_Entrane');
-define('DB_PASS', 'En70frevaern@');
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: '');
+define('DB_USER', getenv('DB_USER') ?: '');
+define('DB_PASS', getenv('DB_PASS') ?: '');
 
 // Pour SQLite (alternative si MySQL n'est pas disponible)
-define('USE_SQLITE', false); // Mettre à true pour utiliser SQLite au lieu de MySQL
+define('USE_SQLITE', false);
 define('SQLITE_DB_PATH', __DIR__ . '/../database.sqlite');
 
 // Configuration de sécurité
-define('JWT_SECRET', 'VotreSecretJWTTresSecurise123!@#'); // CHANGEZ CECI EN PRODUCTION
-define('SESSION_SECRET', 'VotreSecretSessionTresSecurise456$%^'); // CHANGEZ CECI EN PRODUCTION
+define('JWT_SECRET', getenv('JWT_SECRET') ?: '');
+define('SESSION_SECRET', getenv('SESSION_SECRET') ?: '');
 define('BCRYPT_COST', 12);
+
+// Vérifier que les secrets sont définis
+if (empty(JWT_SECRET) || empty(SESSION_SECRET)) {
+    die('Erreur: JWT_SECRET et SESSION_SECRET doivent être définis dans .env');
+}
 
 // Configuration de session
 ini_set('session.cookie_httponly', 1);

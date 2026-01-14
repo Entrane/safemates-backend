@@ -14,12 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Config DB directement ici
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u639530603_SafeMates');
-define('DB_USER', 'u639530603_Entrane');
-define('DB_PASS', 'En70frevaern@');
-define('JWT_SECRET', 'VotreSecretJWTTresSecurise123!@#');
+// Charger configuration depuis config.php
+require_once __DIR__ . '/config.php';
 
 // Connexion DB
 try {

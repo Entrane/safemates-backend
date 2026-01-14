@@ -84,3 +84,7 @@ uploads/
 
 # Fichier Windows problématique
 nul
+
+# Scripts de déploiement avec credentials
+deploy-direct.bat
+deploy.bat
