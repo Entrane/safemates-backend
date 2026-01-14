@@ -181,10 +181,10 @@ class ChatManager {
     startGlobalPolling() {
         if (this.pollingInterval) return;
 
-        // Polling toutes les 5 secondes pour TOUS les amis (pas seulement chats actifs)
+        // Polling toutes les 3 secondes pour TOUS les amis (pas seulement chats actifs)
         this.pollingInterval = setInterval(() => {
             this.fetchAllFriendsMessages();
-        }, 5000);
+        }, 3000);
     }
 
     // Récupérer les messages de tous les amis
