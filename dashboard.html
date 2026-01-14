@@ -2326,10 +2326,13 @@ window.sendMessage = async (e, username) => {
     if (!input.value.trim()) return;
     
     const result = await window.ChatManager.sendMessage(username, input.value.trim());
-    
+
     if (result.success) {
         input.value = "";
         updateChatUI(username);
+        // Marquer comme lu après l'envoi
+        window.ChatManager.markAsRead(username);
+        updateFriendsNotificationBadge();
     } else {
         console.error('Erreur envoi message:', result.error);
         alert('Erreur lors de l\'envoi du message');
