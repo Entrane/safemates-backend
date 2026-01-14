@@ -36,7 +36,7 @@ try {
         SET is_read = 1, updated_at = NOW()
         WHERE id = ? AND user_id = ?
     ");
-    $stmt->execute([$notificationId, $_SESSION['user_id']]);
+    $stmt->execute([$notificationId, $userId]);
 
     sendJSON(['success' => true]);
 

@@ -1987,6 +1987,20 @@ window.markAllAsRead = async function() {
     loadNotifications();
 };
 
+// Marquer les notifications de messages d'un utilisateur comme lues
+async function markMessageNotificationsAsRead(username) {
+    try {
+        await fetchProtected('/api/notifications/read-messages', {
+            method: 'POST',
+            body: JSON.stringify({ fromUsername: username })
+        });
+        // Recharger les notifications pour mettre à jour le badge
+        loadNotifications();
+    } catch (error) {
+        console.error('Erreur marquage notifications messages:', error);
+    }
+}
+
 // Formater l'heure
 function formatTime(dateString) {
     const date = new Date(dateString);
@@ -2790,6 +2804,9 @@ window.openChat = (username) => {
 
         // Marquer les messages comme lus
         window.ChatManager.markAsRead(username);
+
+        // Marquer les notifications de messages de cet utilisateur comme lues
+        markMessageNotificationsAsRead(username);
 
         // Mettre à jour les badges
         updateFriendsNotificationBadge();
