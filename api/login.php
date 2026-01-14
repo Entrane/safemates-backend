@@ -5,6 +5,8 @@
  */
 
 require_once 'config.php';
+require_once 'RateLimiter.php';
+require_once 'SecurityLogger.php';
 
 // Vérifier que c'est bien une requête POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -29,6 +31,26 @@ if (empty($identifier) || empty($password)) {
 
 try {
     $db = getDB();
+    $rateLimiter = new RateLimiter($db);
+    $securityLogger = new SecurityLogger($db);
+
+    // RATE LIMITING - Max 5 tentatives en 5 minutes
+    $clientIP = RateLimiter::getIdentifier();
+    $rateLimit = $rateLimiter->checkLimit($clientIP, 'login', 5, 300, 900);
+
+    if (!$rateLimit['allowed']) {
+        $securityLogger->warning(
+            SecurityLogger::EVENT_RATE_LIMIT_HIT,
+            "Trop de tentatives de connexion: {$identifier}",
+            null,
+            $identifier,
+            ['attempts' => $rateLimit]
+        );
+        sendJSON([
+            'error' => $rateLimit['message'] ?? 'Trop de tentatives',
+            'retry_after' => $rateLimit['retry_after']
+        ], 429);
+    }
 
     // Récupérer l'utilisateur
     $stmt = $db->prepare('
@@ -40,18 +62,37 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
+        $securityLogger->warning(
+            SecurityLogger::EVENT_LOGIN_FAILED,
+            "Tentative de connexion avec identifiant inexistant: {$identifier}"
+        );
         sendJSON(['error' => 'Identifiants incorrects'], 401);
     }
 
     // Vérifier si l'utilisateur est banni
     if ($user['is_banned'] == 1) {
+        $securityLogger->warning(
+            SecurityLogger::EVENT_UNAUTHORIZED_ACCESS,
+            "Tentative de connexion d'un compte banni",
+            $user['id'],
+            $user['username']
+        );
         sendJSON(['error' => 'Votre compte a été banni'], 403);
     }
 
     // Vérifier le mot de passe
     if (!verifyPassword($password, $user['password'])) {
+        $securityLogger->warning(
+            SecurityLogger::EVENT_LOGIN_FAILED,
+            "Mot de passe incorrect pour: {$user['username']}",
+            $user['id'],
+            $user['username']
+        );
         sendJSON(['error' => 'Identifiants incorrects'], 401);
     }
+
+    // LOGIN RÉUSSI - Réinitialiser le rate limiter
+    $rateLimiter->reset($clientIP, 'login');
 
     // Démarrer la session PHP
     session_start();
@@ -70,6 +111,14 @@ try {
 
     // Générer un token JWT
     $token = generateToken($user['id'], $user['username']);
+
+    // Logger le succès
+    $securityLogger->info(
+        SecurityLogger::EVENT_LOGIN_SUCCESS,
+        "Connexion réussie",
+        $user['id'],
+        $user['username']
+    );
 
     // Succès
     sendJSON([
