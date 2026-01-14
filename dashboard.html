@@ -1900,12 +1900,15 @@ async function loadNotifications() {
     try {
         const response = await fetchProtected('/api/notifications');
         if (response.ok) {
-            notifications = await response.json();
+            const data = await response.json();
+            // S'assurer que notifications est un tableau
+            notifications = Array.isArray(data) ? data : (data.notifications || []);
             renderNotifications();
             updateNotificationBadge();
         }
     } catch (error) {
         console.error('Erreur chargement notifications:', error);
+        notifications = []; // Initialiser comme tableau vide en cas d'erreur
     }
 }
 
@@ -2272,6 +2275,11 @@ document.addEventListener('DOMContentLoaded', function() {
             logout();
         });
     });
+
+    // Ajouter la section Discord au chargement de la page
+    setTimeout(() => {
+        addDiscordSection();
+    }, 1000);
 });
 
 // ====================================================
