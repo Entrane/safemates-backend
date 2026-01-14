@@ -1204,6 +1204,62 @@
         }
     }
 
+    /* Section Discord */
+    .discord-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #5865F2 0%, #404EED 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 8px 24px rgba(88, 101, 242, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .discord-section:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(88, 101, 242, 0.4);
+    }
+
+    .discord-icon {
+        font-size: 48px;
+        color: white;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .discord-content {
+        flex: 1;
+    }
+
+    .discord-text {
+        color: white;
+        font-size: 1rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .discord-link {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 24px;
+        background: white;
+        color: #5865F2;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .discord-link:hover {
+        background: #f6f6f6;
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
     /* Badge sur une carte d'ami avec message non lu */
     .friend-card-badge {
         background: var(--primary-color);
@@ -1627,8 +1683,6 @@
             <ul>
               <li><strong>Rang minimum/maximum</strong> : Définissez la plage de grades acceptés</li>
               <li><strong>Tolérance de rang</strong> : Ajustez la flexibilité sur les niveaux</li>
-              <li><strong>Mode de jeu</strong> : Filtrez par mode souhaité</li>
-              <li><strong>Communication</strong> : Trouvez des joueurs avec/sans vocal</li>
             </ul>
           </div>
         </div>
@@ -1729,6 +1783,20 @@
         <div class="game-card"><a href="game.html?game=fortnite"><img src="Image/Image_jeux/fortnite.jpg" alt="Fortnite" class="game-img"><div class="game-overlay"><div class="game-title">Fortnite</div></div></a></div>
         <div class="game-card"><a href="game.html?game=warzone"><img src="Image/Image_jeux/warzone.avif" alt="Call of Duty: Warzone" class="game-img"><div class="game-overlay"><div class="game-title">Call of Duty: Warzone</div></div></a></div>
       </div>
+
+      <!-- Section Discord -->
+      <div class="discord-section">
+        <div class="discord-icon">
+          <i class="fab fa-discord"></i>
+        </div>
+        <div class="discord-content">
+          <p class="discord-text">Rejoins notre Discord pour échanger avec tes nouveaux teammates !</p>
+          <a href="https://discord.gg/5v9jPQEX" target="_blank" class="discord-link">
+            <i class="fab fa-discord"></i> Rejoindre le Discord
+          </a>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -2790,7 +2858,7 @@ window.startGameProfile = () => {
     closeGameGuide();
 };
 
-// Intercepter les clics sur les cartes de jeux
+// Intercepter les clics sur les cartes de jeux pour afficher le guide
 document.addEventListener('DOMContentLoaded', () => {
     // Attendre un peu pour que les cartes soient chargées dynamiquement
     setTimeout(() => {
@@ -2798,13 +2866,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCards.forEach(card => {
             const link = card.querySelector('a');
             if (link) {
-                const gameName = link.querySelector('.game-title')?.textContent || 'Jeu';
-                const gameImg = link.querySelector('img')?.src || '';
-
-                // Empêcher la navigation directe
+                // Ajouter un paramètre pour indiquer qu'il faut afficher le guide
                 link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openGameGuide(gameName, gameImg);
+                    const href = link.getAttribute('href');
+                    if (href) {
+                        // Ajouter le paramètre showGuide=true à l'URL
+                        const separator = href.includes('?') ? '&' : '?';
+                        link.setAttribute('href', href + separator + 'showGuide=true');
+                    }
                 });
             }
         });
